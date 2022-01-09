@@ -13,6 +13,8 @@ namespace TheGame
         int currentRes = 1;
         int resScale = 1;
         bool escapeKeyWasPressed = false;
+        bool isClicking = false;
+        Point mousePos;
 
         //Declaring Backgrounds
         Texture2D mainMenuSprite;
@@ -61,13 +63,13 @@ namespace TheGame
         bool blueIsDodging = false;
 
         // Declaring rectangles so I can use them in collisions
-        Rectangle redguyRect;
-        Rectangle blueguyRect;
-        Rectangle mainmenuRect;
-        Rectangle singleplayerButtonRect;
-        Rectangle coopButtonRect;
-        Rectangle settingsButtonRect;
-        Rectangle exitButtonRect;
+        public Rectangle redguyRect;
+        public Rectangle blueguyRect;
+        public Rectangle mouseRect;
+        public Rectangle singleplayerButtonRect;
+        public Rectangle coopButtonRect;
+        public Rectangle settingsButtonRect;
+        public Rectangle exitButtonRect;
 
         // Red Guy Controls
         Keys redguyMoveUp = Keys.W;
@@ -83,9 +85,7 @@ namespace TheGame
         Keys blueguyMoveLeft = Keys.Left;
         Keys blueguyMoveRight = Keys.Right;
         Keys blueguyShoot = Keys.OemPeriod;
-        Keys blueguyShoot2 = Keys.NumPad1;
         Keys blueguyDodge = Keys.OemComma;
-        Keys blueguyDodge2 = Keys.NumPad2;
 
         public Game1()
         {
@@ -135,6 +135,13 @@ namespace TheGame
         {
             // TODO: Add your update logic here
             MouseState mouseState = Mouse.GetState();
+            mousePos = new Point(mouseState.X, mouseState.Y);
+            bool clicked = mouseState.LeftButton == ButtonState.Pressed;
+
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                isClicking = false;
+            }
 
             if (mouseState.RightButton == ButtonState.Pressed)
             {
@@ -168,9 +175,24 @@ namespace TheGame
 
             if(isInMainMenu == true)
             {
-                if(mouseState.X > 290 * resScale && mouseState.X < 290 * resScale + oneButton.Width * resScale && mouseState.Y > 200 * resScale && mouseState.Y > oneButton.Height* resScale && mouseState.LeftButton == ButtonState.Pressed)
+                if (singleplayerButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
-                    Debug.WriteLine("poopoo");
+                    isClicking = true;
+                    Debug.WriteLine("singleplayer");
+                }
+                else if (coopButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
+                {
+                    isClicking = true;
+                    Debug.WriteLine("coop");
+                }
+                else if (settingsButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
+                {
+                    isClicking = true;
+                    Debug.WriteLine("settings");
+                }
+                else if (exitButtonRect.Intersects(mouseRect) && clicked)
+                {
+                    Exit();
                 }
             }
 
@@ -186,11 +208,12 @@ namespace TheGame
                 SamplerState.PointClamp
                );
 
+            mouseRect = new Rectangle(mousePos.X, mousePos.Y, 1, 1);
             Rectangle mainmenuRect = new Rectangle(0, 0, mainMenuSprite.Width * resScale, mainMenuSprite.Height * resScale);
-            Rectangle singleplayerButtonRect = new Rectangle(290 * resScale, 200 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
-            Rectangle coopButtonRect = new Rectangle(290 * resScale, 280 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
-            Rectangle settingsButtonRect = new Rectangle(5 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
-            Rectangle exitButtonRect = new Rectangle(595 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            singleplayerButtonRect = new Rectangle(290 * resScale, 200 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            coopButtonRect = new Rectangle(290 * resScale, 280 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            settingsButtonRect = new Rectangle(5 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            exitButtonRect = new Rectangle(595 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
 
             if (isInMainMenu == true)
             {
@@ -199,6 +222,7 @@ namespace TheGame
                 _spriteBatch.Draw(coopButton, coopButtonRect, Color.White);
                 _spriteBatch.Draw(settingsButton, settingsButtonRect, Color.White);
                 _spriteBatch.Draw(exitButton, exitButtonRect, Color.White);
+                _spriteBatch.Draw(oneButton, mouseRect, Color.Transparent);
             }
 
             _spriteBatch.End();
