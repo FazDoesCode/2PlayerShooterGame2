@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Diagnostics;
 
 namespace TheGame
@@ -29,6 +30,7 @@ namespace TheGame
         Texture2D settingsButton;
 
         //Declaring Players
+        Texture2D coopMapSprite;
         Texture2D playerOneSprite;
         Texture2D playerOneDodgeSprite;
         Texture2D playerTwoSprite;
@@ -37,6 +39,13 @@ namespace TheGame
 
         // Main menu stuff
         bool isInMainMenu = true;
+
+        // In game stuff
+        bool gameHasStarted = false;
+        bool inWorldMap = false;
+        bool inCombat = false;
+        bool inCoop = false;
+        bool inSingleplayer = false;
 
         // Position & walking stuff
         double redTimeSinceLastWalked = 0;
@@ -96,6 +105,22 @@ namespace TheGame
 
         protected override void Initialize()
         {
+            int windowTitleThing = new Random().Next(1, 5);
+            switch (windowTitleThing)
+            {
+                case 1:
+                    Window.Title = "The greatest sequel ever";
+                    break;
+                case 2:
+                    Window.Title = "2playershootergame best game 2030";
+                    break;
+                case 3:
+                    Window.Title = "a glockenspiel is an instrument though";
+                    break;
+                case 4:
+                    Window.Title = "incredible";
+                    break;
+            }
             _graphics.IsFullScreen = false;
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 480;
@@ -114,6 +139,7 @@ namespace TheGame
             settingsButton = Content.Load<Texture2D>("Items/settingsbutton");
 
             //Players
+            coopMapSprite = Content.Load<Texture2D>("Players/CoopGuys");
             playerOneSprite = Content.Load<Texture2D>("Players/Redguy");
             playerTwoSprite = Content.Load<Texture2D>("Players/Blueguy");
             playerOneDodgeSprite = Content.Load<Texture2D>("Players/Redguydodgelarge");
@@ -178,12 +204,21 @@ namespace TheGame
                 if (singleplayerButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
-                    Debug.WriteLine("singleplayer");
+                    isInMainMenu = false;
+                    gameHasStarted = true;
+                    inWorldMap = true;
+                    inCoop = false;
+                    inSingleplayer = true;
+                    // Put some cutscene shit here
                 }
                 else if (coopButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
-                    Debug.WriteLine("coop");
+                    isInMainMenu = false;
+                    gameHasStarted = true;
+                    inWorldMap = true;
+                    inSingleplayer = false;
+                    inCoop = true;
                 }
                 else if (settingsButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {

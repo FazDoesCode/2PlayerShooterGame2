@@ -111,18 +111,6 @@
 /processorParam:TextureFormat=Color
 /build:Items/Bullet.png
 
-#begin Items/Bullet.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Items/Bullet.png
-
 #begin Items/buttonbase.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -158,18 +146,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Items/exitbutton.png
-
-#begin Items/Fastshoe.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Items/Fastshoe.png
 
 #begin Items/Fastshoe.png
 /importer:TextureImporter
@@ -219,18 +195,6 @@
 /processorParam:TextureFormat=Color
 /build:Players/Blueguy.png
 
-#begin Players/Blueguy.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Players/Blueguy.png
-
 #begin Players/Blueguydodgelarge.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -243,7 +207,7 @@
 /processorParam:TextureFormat=Color
 /build:Players/Blueguydodgelarge.png
 
-#begin Players/Blueguydodgelarge.png
+#begin Players/CoopGuys.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -253,7 +217,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Players/Blueguydodgelarge.png
+/build:Players/CoopGuys.png
 
 #begin Players/Gravestone.png
 /importer:TextureImporter
@@ -279,30 +243,6 @@
 /processorParam:TextureFormat=Color
 /build:Players/Redguy.png
 
-#begin Players/Redguy.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Players/Redguy.png
-
-#begin Players/Redguydodgelarge.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Players/Redguydodgelarge.png
-
 #begin Players/Redguydodgelarge.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -321,15 +261,21 @@
 /processorParam:Quality=Best
 /build:sound effects/bang.mp3
 
-#begin sound effects/bling.mp3
+#begin sound effects/bang.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
+/processor:SongProcessor
 /processorParam:Quality=Best
-/build:sound effects/bling.mp3
+/build:sound effects/bang.mp3
 
 #begin sound effects/Boom.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/Boom.mp3
+
+#begin sound effects/Boom.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/Boom.mp3
 
@@ -339,17 +285,23 @@
 /processorParam:Quality=Best
 /build:sound effects/deathsound.mp3
 
+#begin sound effects/deathsound.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:sound effects/deathsound.mp3
+
 #begin sound effects/pew.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sound effects/pew.mp3
 
-#begin sound effects/pop.mp3
+#begin sound effects/pew.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
+/processor:SongProcessor
 /processorParam:Quality=Best
-/build:sound effects/pop.mp3
+/build:sound effects/pew.mp3
 
 #begin sound effects/walksound.mp3
 /importer:Mp3Importer
@@ -357,9 +309,21 @@
 /processorParam:Quality=Best
 /build:sound effects/walksound.mp3
 
+#begin sound effects/walksound.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:sound effects/walksound.mp3
+
 #begin sound effects/woosh.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sound effects/woosh.mp3
+
+#begin sound effects/woosh.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/woosh.mp3
 
