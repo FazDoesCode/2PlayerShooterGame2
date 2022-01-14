@@ -37,6 +37,18 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/mainmenu.png
 
+#begin Backgrounds/mapwip.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/mapwip.png
+
 #begin Enemies/Smiley.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -257,21 +269,9 @@
 
 #begin sound effects/bang.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound effects/bang.mp3
-
-#begin sound effects/bang.mp3
-/importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/bang.mp3
-
-#begin sound effects/Boom.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound effects/Boom.mp3
 
 #begin sound effects/Boom.mp3
 /importer:Mp3Importer
@@ -281,21 +281,9 @@
 
 #begin sound effects/deathsound.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound effects/deathsound.mp3
-
-#begin sound effects/deathsound.mp3
-/importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/deathsound.mp3
-
-#begin sound effects/pew.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound effects/pew.mp3
 
 #begin sound effects/pew.mp3
 /importer:Mp3Importer
@@ -305,21 +293,9 @@
 
 #begin sound effects/walksound.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound effects/walksound.mp3
-
-#begin sound effects/walksound.mp3
-/importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/walksound.mp3
-
-#begin sound effects/woosh.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sound effects/woosh.mp3
 
 #begin sound effects/woosh.mp3
 /importer:Mp3Importer

@@ -16,10 +16,12 @@ namespace TheGame
         bool escapeKeyWasPressed = false;
         bool isClicking = false;
         Point mousePos;
+        bool clicked;
 
         //Declaring Backgrounds
         Texture2D mainMenuSprite;
         Texture2D controlsScreen;
+        Texture2D mapSprite;
         
         //Declaring Buttons
         Texture2D oneButton;
@@ -46,6 +48,7 @@ namespace TheGame
         bool inCombat = false;
         bool inCoop = false;
         bool inSingleplayer = false;
+        Vector2 mapPos = new Vector2(0, 0);
 
         // Position & walking stuff
         double redTimeSinceLastWalked = 0;
@@ -72,6 +75,8 @@ namespace TheGame
         bool blueIsDodging = false;
 
         // Declaring rectangles so I can use them in collisions
+        public Rectangle redguyMapRect;
+        public Rectangle coopMapRect;
         public Rectangle redguyRect;
         public Rectangle blueguyRect;
         public Rectangle mouseRect;
@@ -105,30 +110,50 @@ namespace TheGame
 
         protected override void Initialize()
         {
-            int windowTitleThing = new Random().Next(1, 5);
+            int windowTitleThing = new Random().Next(1, 9);
             switch (windowTitleThing)
             {
                 case 1:
                     Window.Title = "The greatest sequel ever";
                     break;
                 case 2:
-                    Window.Title = "2playershootergame best game 2030";
+                    Window.Title = "2playershootergame best game 1997";
                     break;
                 case 3:
-                    Window.Title = "a glockenspiel is an instrument though";
+                    Window.Title = "GLOCKENSPIEL!!!";
                     break;
                 case 4:
-                    Window.Title = "incredible";
+                    Window.Title = "holy moly now THIS is gaming";
+                    break;
+                case 5:
+                    Window.Title = "you know what you have to do.";
+                    break;
+                case 6:
+                    Window.Title = "in what universe?";
+                    break;
+                case 7:
+                    Window.Title = "video games!";
+                    break;
+                case 8:
+                    Window.Title = "amazing";
                     break;
             }
             _graphics.IsFullScreen = false;
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 480;
-            _graphics.ApplyChanges();
+            _graphics.ApplyChanges();  
 
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
             //Backgrounds
             mainMenuSprite = Content.Load<Texture2D>("Backgrounds/mainmenu");
             controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
+            mapSprite = Content.Load<Texture2D>("Backgrounds/mapwip");
 
             //Buttons
             oneButton = Content.Load<Texture2D>("Items/1xbutton");
@@ -144,17 +169,7 @@ namespace TheGame
             playerTwoSprite = Content.Load<Texture2D>("Players/Blueguy");
             playerOneDodgeSprite = Content.Load<Texture2D>("Players/Redguydodgelarge");
             playerTwoDodgeSprite = Content.Load<Texture2D>("Players/Blueguydodgelarge");
-            graveStoneSprite = Content.Load<Texture2D>("Players/Gravestone");            
-
-            base.Initialize();
-        }
-
-        protected override void LoadContent()
-        {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-
-            // TODO: use this.Content to load your game content here
+            graveStoneSprite = Content.Load<Texture2D>("Players/Gravestone");
         }
 
         protected override void Update(GameTime gameTime)
@@ -162,7 +177,7 @@ namespace TheGame
             // TODO: Add your update logic here
             MouseState mouseState = Mouse.GetState();
             mousePos = new Point(mouseState.X, mouseState.Y);
-            bool clicked = mouseState.LeftButton == ButtonState.Pressed;
+            clicked = mouseState.LeftButton == ButtonState.Pressed;
 
             if (mouseState.LeftButton == ButtonState.Released)
             {
@@ -183,6 +198,8 @@ namespace TheGame
                     _graphics.PreferredBackBufferHeight = 960;
                     _graphics.ApplyChanges();
                     currentRes = 2;
+                    mapPos.X = mapPos.X * resScale;
+                    mapPos.Y = mapPos.Y * resScale;
                 }
                 else if (currentRes == 2 && escapeKeyWasPressed == false)
                 {
@@ -192,6 +209,8 @@ namespace TheGame
                     _graphics.PreferredBackBufferHeight = 480;
                     _graphics.ApplyChanges();
                     currentRes = 1;
+                    mapPos.X = mapPos.X / 2;
+                    mapPos.Y = mapPos.Y / 2;
                 }
             }
             if (Keyboard.GetState().IsKeyUp(Keys.F4))
@@ -204,6 +223,7 @@ namespace TheGame
                 if (singleplayerButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
+                    mapPos = new Vector2(350 * resScale, 225 * resScale);
                     isInMainMenu = false;
                     gameHasStarted = true;
                     inWorldMap = true;
@@ -214,6 +234,7 @@ namespace TheGame
                 else if (coopButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
+                    mapPos = new Vector2(350 * resScale, 225 * resScale);
                     isInMainMenu = false;
                     gameHasStarted = true;
                     inWorldMap = true;
@@ -230,8 +251,31 @@ namespace TheGame
                     Exit();
                 }
             }
+            if (gameHasStarted)
+            {
+                if (inSingleplayer)
+                {
+                    SinglePlayerMapMove(gameTime);
+                }
+            }
 
             base.Update(gameTime);
+        }
+
+        void SinglePlayerMapMove(GameTime gameTime)
+        {
+            MouseState mouseState = Mouse.GetState();
+            mousePos = new Point(mouseState.X, mouseState.Y);
+
+            if (clicked && !isClicking)
+            {
+                isClicking = true;
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    mapPos.X = mousePos.X;
+                    mapPos.Y = mousePos.Y;
+                }
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -250,7 +294,8 @@ namespace TheGame
             settingsButtonRect = new Rectangle(5 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
             exitButtonRect = new Rectangle(595 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
 
-            if (isInMainMenu == true)
+            //Main Menu Drawing
+            if (isInMainMenu)
             {
                 _spriteBatch.Draw(mainMenuSprite, mainmenuRect, Color.White);
                 _spriteBatch.Draw(singleplayerButton, singleplayerButtonRect, Color.White);
@@ -258,6 +303,20 @@ namespace TheGame
                 _spriteBatch.Draw(settingsButton, settingsButtonRect, Color.White);
                 _spriteBatch.Draw(exitButton, exitButtonRect, Color.White);
                 _spriteBatch.Draw(oneButton, mouseRect, Color.Transparent);
+            }
+            //Map Drawing
+            Rectangle mapRect = new Rectangle(0 * resScale, 0 * resScale, mapSprite.Width / 2 * resScale, mapSprite.Height / 2 * resScale);
+            redguyMapRect = new Rectangle((int)mapPos.X, (int)mapPos.Y, playerOneSprite.Width * resScale, playerOneSprite.Height * resScale);
+            if (gameHasStarted)
+            {
+                if (inWorldMap)
+                {
+                    _spriteBatch.Draw(mapSprite, mapRect, Color.White);
+                    if (inSingleplayer)
+                    {
+                        _spriteBatch.Draw(playerOneSprite, redguyMapRect, Color.White);
+                    }
+                }
             }
 
             _spriteBatch.End();
