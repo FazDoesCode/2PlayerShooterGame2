@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace TheGame
@@ -12,7 +13,7 @@ namespace TheGame
         private SpriteBatch _spriteBatch;
 
         int currentRes = 1;
-        int resScale = 1;
+        public int resScale = 1;
         bool escapeKeyWasPressed = false;
         bool isClicking = false;
         Point mousePos;
@@ -38,6 +39,13 @@ namespace TheGame
         Texture2D playerTwoSprite;
         Texture2D playerTwoDodgeSprite;
         Texture2D graveStoneSprite;
+        Texture2D playerOneFlipped;
+
+        // Declaring misc
+        Texture2D mountainSprite;
+
+        //Listing stuff
+        List<Mountain> mountains = new List<Mountain>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -48,7 +56,18 @@ namespace TheGame
         bool inCombat = false;
         bool inCoop = false;
         bool inSingleplayer = false;
-        Vector2 mapPos = new Vector2(0, 0);
+        Vector2 mapPos;
+        Vector2 targetPos;
+        bool isMoving = false;
+        int mapSpeed = 1;
+        bool movingup;
+        bool movingright;
+
+        float distanceToTravelX;
+        float distanceToTravelY;
+        float distanceToTravelTotal;
+        float movementX;
+        float movementY;
 
         // Position & walking stuff
         double redTimeSinceLastWalked = 0;
@@ -85,6 +104,11 @@ namespace TheGame
         public Rectangle settingsButtonRect;
         public Rectangle exitButtonRect;
 
+        public Rectangle plainsRect = new Rectangle(400, 0, 300, 345);
+        public Rectangle snowRect= new Rectangle(100, 0, 290, 265);
+        public Rectangle desertRect = new Rectangle(100, 250, 290, 200);
+        public Rectangle swampRect;
+
         // Red Guy Controls
         Keys redguyMoveUp = Keys.W;
         Keys redguyMoveDown = Keys.S;
@@ -110,7 +134,7 @@ namespace TheGame
 
         protected override void Initialize()
         {
-            int windowTitleThing = new Random().Next(1, 9);
+            int windowTitleThing = new Random().Next(1, 11);
             switch (windowTitleThing)
             {
                 case 1:
@@ -136,6 +160,12 @@ namespace TheGame
                     break;
                 case 8:
                     Window.Title = "amazing";
+                    break;
+                case 9:
+                    Window.Title = "title length";
+                    break;
+                case 10:
+                    Window.Title = "minecraft.exe";
                     break;
             }
             _graphics.IsFullScreen = false;
@@ -170,6 +200,10 @@ namespace TheGame
             playerOneDodgeSprite = Content.Load<Texture2D>("Players/Redguydodgelarge");
             playerTwoDodgeSprite = Content.Load<Texture2D>("Players/Blueguydodgelarge");
             graveStoneSprite = Content.Load<Texture2D>("Players/Gravestone");
+            playerOneFlipped = Content.Load<Texture2D>("Players/redguyflip");
+
+            //Misc
+            mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
         }
 
         protected override void Update(GameTime gameTime)
@@ -194,6 +228,11 @@ namespace TheGame
                 {
                     escapeKeyWasPressed = true;
                     resScale = 2;
+                    plainsRect = new Rectangle(400 * resScale, 0 * resScale, 300 * resScale, 345 * resScale);
+                    snowRect = new Rectangle(100 * resScale, 0 * resScale, 290 * resScale, 265 * resScale);
+                    desertRect = new Rectangle(100 * resScale, 250 * resScale, 290 * resScale, 200 * resScale);
+                    mountains.Clear();
+                    SpawnScenery();
                     _graphics.PreferredBackBufferWidth = 1600;
                     _graphics.PreferredBackBufferHeight = 960;
                     _graphics.ApplyChanges();
@@ -205,6 +244,11 @@ namespace TheGame
                 {
                     escapeKeyWasPressed = true;
                     resScale = 1;
+                    plainsRect = new Rectangle(400 * resScale, 0 * resScale, 300 * resScale, 345 * resScale);
+                    snowRect = new Rectangle(100 * resScale, 0 * resScale, 290 * resScale, 265 * resScale);
+                    desertRect = new Rectangle(100 * resScale, 250 * resScale, 290 * resScale, 200 * resScale);
+                    mountains.Clear();
+                    SpawnScenery();
                     _graphics.PreferredBackBufferWidth = 800;
                     _graphics.PreferredBackBufferHeight = 480;
                     _graphics.ApplyChanges();
@@ -223,7 +267,8 @@ namespace TheGame
                 if (singleplayerButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
-                    mapPos = new Vector2(350 * resScale, 225 * resScale);
+                    SpawnScenery();
+                    mapPos = new Vector2(385 * resScale, 245 * resScale);
                     isInMainMenu = false;
                     gameHasStarted = true;
                     inWorldMap = true;
@@ -234,7 +279,7 @@ namespace TheGame
                 else if (coopButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
-                    mapPos = new Vector2(350 * resScale, 225 * resScale);
+                    mapPos = new Vector2(385 * resScale, 245 * resScale);
                     isInMainMenu = false;
                     gameHasStarted = true;
                     inWorldMap = true;
@@ -255,14 +300,24 @@ namespace TheGame
             {
                 if (inSingleplayer)
                 {
-                    SinglePlayerMapMove(gameTime);
+                    PlayerMapMove(gameTime);
+                    if (plainsRect.Contains(redguyMapRect))
+                    {
+                        //Debug.WriteLine("In plains");
+                    } else if (snowRect.Contains(redguyMapRect))
+                    {
+                        //Debug.WriteLine("In snow");
+                    } else if (desertRect.Contains(redguyMapRect))
+                    {
+                        //Debug.WriteLine("In desert");
+                    }
                 }
             }
 
             base.Update(gameTime);
         }
 
-        void SinglePlayerMapMove(GameTime gameTime)
+        void PlayerMapMove(GameTime gameTime)
         {
             MouseState mouseState = Mouse.GetState();
             mousePos = new Point(mouseState.X, mouseState.Y);
@@ -272,10 +327,88 @@ namespace TheGame
                 isClicking = true;
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
-                    mapPos.X = mousePos.X;
-                    mapPos.Y = mousePos.Y;
+                    targetPos.X = mousePos.X - 7 * resScale;
+                    targetPos.Y = mousePos.Y - 13 * resScale;
+
+                    distanceToTravelX = targetPos.X - mapPos.X;
+                    distanceToTravelY = targetPos.Y - mapPos.Y;
+                    distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
+                    movementX = distanceToTravelX / distanceToTravelTotal;
+                    movementY = distanceToTravelY / distanceToTravelTotal;
+
+                    isMoving = true;
                 }
             }
+            if (isMoving)
+            {
+                if (movementX > 0)
+                {
+                    movingright = true;
+                    //Debug.WriteLine("Moving Right");
+                } else if (movementX < 0)
+                {
+                    movingright = false;
+                    //Debug.WriteLine("Moving Left");
+                }
+                if (movementY > 0)
+                {
+                    movingup = false;
+                    //Debug.WriteLine("Moving Down");
+                } else if (movementY < 0)
+                {
+                    movingup = true;
+                    //Debug.WriteLine("Moving Up");
+                }
+                for (int i = 0; i < mountains.Count; i++)
+                {
+                    if (redguyMapRect.Intersects(mountains[i].mountainRect))
+                    {
+                        switch (movingup) {
+                            case true:
+                                mapPos.Y += (mapSpeed + 1) * resScale;
+                                break;
+                            case false:
+                                mapPos.Y -= (mapSpeed + 1) * resScale;
+                                break;
+                        }
+                        switch (movingright)
+                        {
+                            case true:
+                                mapPos.X -= (mapSpeed + 1) * resScale;
+                                break;
+                            case false:
+                                mapPos.X += (mapSpeed + 1) * resScale;
+                                break;
+                        }
+                        isMoving = false;
+                    }
+                }
+                mapPos.X += movementX * (mapSpeed * resScale);
+                mapPos.Y += movementY * (mapSpeed * resScale);
+                Vector2 mapPosRound = new Vector2((float)Math.Round(mapPos.X), (float)Math.Round(mapPos.Y));
+                if (targetPos == mapPosRound)
+                {
+                    isMoving = false;
+                }
+            }
+        }
+
+        // That scenery....
+        void SpawnScenery()
+        {
+            // Mountains
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(295 * resScale), (int)(7 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(305 * resScale), (int)(28 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(300 * resScale), (int)(46 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(312 * resScale), (int)(68 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(325 * resScale), (int)(101 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(340 * resScale), (int)(133 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(322 * resScale), (int)(143 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(569 * resScale), (int)(285 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(516 * resScale), (int)(289 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(545 * resScale), (int)(292 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(493 * resScale), (int)(300 * resScale)), resScale));
+            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(468 * resScale), (int)(307 * resScale)), resScale));
         }
 
         protected override void Draw(GameTime gameTime)
@@ -311,10 +444,24 @@ namespace TheGame
             {
                 if (inWorldMap)
                 {
+                    // Map sprite here
                     _spriteBatch.Draw(mapSprite, mapRect, Color.White);
+                    // Mountains
+                    for (int i = 0; i < mountains.Count; i++)
+                    {
+                        mountains[i].Draw(_spriteBatch);
+                    }
+                    // Buildings / Scenery
                     if (inSingleplayer)
                     {
-                        _spriteBatch.Draw(playerOneSprite, redguyMapRect, Color.White);
+                        if (mousePos.X < mapPos.X + 7)
+                        {
+                            _spriteBatch.Draw(playerOneFlipped, redguyMapRect, Color.White);
+                        }
+                        else
+                        {
+                            _spriteBatch.Draw(playerOneSprite, redguyMapRect, Color.White);
+                        }
                     }
                 }
             }
