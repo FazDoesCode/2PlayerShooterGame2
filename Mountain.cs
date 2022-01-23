@@ -23,9 +23,10 @@ namespace TheGame
 
         public void Draw(SpriteBatch spritebatch)
         {
-            mountainRect = new Rectangle((int)position.X + 15 * scale, (int)position.Y - 5 * scale, (int)((mountainSprite.Width - 30) * scale), (int)(30 * scale));
+            mountainRect = new Rectangle((int)position.X + 15 * scale, (int)position.Y - 1 * scale, (int)((mountainSprite.Width - 30) * scale), (int)(30 * scale));
             Rectangle mountainRectshow = new Rectangle((int)position.X, (int)position.Y, (int)(mountainSprite.Width * scale), (int)(mountainSprite.Height * scale));
             spritebatch.Draw(mountainSprite, mountainRectshow, Color.White);
+            //spritebatch.Draw(mountainSprite, mountainRect, Color.Red);
         }
     }
 }
