@@ -63,7 +63,7 @@ namespace TheGame
         Vector2 mapPos;
         Vector2 targetPos;
         bool isMapMoving = false;
-        int mapSpeed = 1;
+        double mapSpeed = 0.85;
 
         float distanceToTravelX;
         float distanceToTravelY;
@@ -435,8 +435,8 @@ namespace TheGame
                     isMapMoving = false;
                 }
                 lastKnownPos = mapPos;
-                mapPos.X += movementX * (mapSpeed * resScale);
-                mapPos.Y += movementY * (mapSpeed * resScale);
+                mapPos.X += movementX * ((float)mapSpeed * resScale);
+                mapPos.Y += movementY * ((float)mapSpeed * resScale);
                 if (distanceToTravelTotal < 1)
                 {
                     isMapMoving = false;
@@ -450,7 +450,7 @@ namespace TheGame
             {
                 if (isInPlains)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 1000)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 1500)
                     {
                         if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
                         {
