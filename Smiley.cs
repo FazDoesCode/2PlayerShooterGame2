@@ -19,7 +19,7 @@ namespace TheGame
         bool canCharge = true;
         bool isCharging = false;
 
-        Vector2 position;
+        public Vector2 position;
         Vector2 originalPos;
         Texture2D smileySprite;
 
@@ -42,7 +42,7 @@ namespace TheGame
                 timeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
                 canDoAction = false;
             }
-            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 500)
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 750)
             {
                 randomNumberToSix = new Random().Next(1, 7);
                 canDoAction = true;
@@ -111,7 +111,7 @@ namespace TheGame
             position.Y += 4 * scale;
         }
 
-        void Charge()
+        public void Charge()
         {
             canCharge = true;
             isCharging = true;

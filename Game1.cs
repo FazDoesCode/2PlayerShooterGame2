@@ -36,12 +36,12 @@ namespace TheGame
 
         //Declaring Players
         Texture2D coopMapSprite;
-        Texture2D playerOneSprite;
-        Texture2D playerOneDodgeSprite;
-        Texture2D playerTwoSprite;
-        Texture2D playerTwoDodgeSprite;
+        Texture2D redguySprite;
+        Texture2D redguyDodgeSprite;
+        Texture2D blueguySprite;
+        Texture2D blueguyDodgeSprite;
         Texture2D graveStoneSprite;
-        Texture2D playerOneFlipped;
+        Texture2D redguyFlipped;
         Texture2D coopGuysFlipped;
 
         //Declaring Enemies
@@ -127,7 +127,11 @@ namespace TheGame
         public Rectangle redguyMapRect;
         public Rectangle coopMapRect;
         public Rectangle redguyRect;
+        public Rectangle redguyBody;
+        public Rectangle redguyHead;
         public Rectangle blueguyRect;
+        public Rectangle blueguyBody;
+        public Rectangle blueguyHead;
         public Rectangle mouseRect;
         public Rectangle singleplayerButtonRect;
         public Rectangle coopButtonRect;
@@ -165,7 +169,7 @@ namespace TheGame
 
         protected override void Initialize()
         {
-            int windowTitleThing = new Random().Next(1, 13);
+            int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
             {
                 case 1:
@@ -204,6 +208,27 @@ namespace TheGame
                 case 12:
                     Window.Title = "KILL THE IMPOSTOR!!!!!";
                     break;
+                case 13:
+                    Window.Title = "shoutout stack overflow for free code";
+                    break;
+                case 14:
+                    Window.Title = "woooo, monogame!";
+                    break;
+                case 15:
+                    Window.Title = "only the funniest";
+                    break;
+                case 16:
+                    Window.Title = "minecraft.exe";
+                    break;
+                case 17:
+                    Window.Title = "huh, it really DOES look like spain.";
+                    break;
+                case 18:
+                    Window.Title = "greens-kun";
+                    break;
+                default:
+                    Window.Title = "sample text";
+                    break;
 
             }
             _graphics.IsFullScreen = false;
@@ -233,12 +258,12 @@ namespace TheGame
 
             //Players
             coopMapSprite = Content.Load<Texture2D>("Players/CoopGuys");
-            playerOneSprite = Content.Load<Texture2D>("Players/Redguy");
-            playerTwoSprite = Content.Load<Texture2D>("Players/Blueguy");
-            playerOneDodgeSprite = Content.Load<Texture2D>("Players/Redguydodgelarge");
-            playerTwoDodgeSprite = Content.Load<Texture2D>("Players/Blueguydodgelarge");
+            redguySprite = Content.Load<Texture2D>("Players/Redguy");
+            blueguySprite = Content.Load<Texture2D>("Players/Blueguy");
+            redguyDodgeSprite = Content.Load<Texture2D>("Players/Redguydodgelarge");
+            blueguyDodgeSprite = Content.Load<Texture2D>("Players/Blueguydodgelarge");
             graveStoneSprite = Content.Load<Texture2D>("Players/Gravestone");
-            playerOneFlipped = Content.Load<Texture2D>("Players/redguyflip");
+            redguyFlipped = Content.Load<Texture2D>("Players/redguyflip");
             coopGuysFlipped = Content.Load<Texture2D>("Players/CoopGuysFlipped");
 
             //Enemies
@@ -430,7 +455,11 @@ namespace TheGame
                             for (int i = 0; i < smileys.Count; i++)
                             {
                                 smileys[i].EnemyAction(gameTime);
-                                if (redguyRect.Intersects(smileys[i].smileyRect))
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y)
+                                {
+                                    smileys[i].Charge();
+                                }
+                                if (redguyHead.Intersects(smileys[i].smileyRect) || redguyBody.Intersects(smileys[i].smileyRect))
                                 {
                                     if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
                                     {
@@ -614,6 +643,7 @@ namespace TheGame
 
         void PlainsEncounter(GameTime gameTime)
         {
+            isMapMoving = false;
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
@@ -630,10 +660,10 @@ namespace TheGame
                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 240 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier));
                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(600 * resScale, 350 * resScale), new Vector2(550 * resScale, 350 * resScale), resScale, 5 * healthMultiplier));
                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(550 * resScale, 290 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier));
-                if (extraSmiley == 2)
+                if (extraSmiley == 1)
                 {
                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(500 * resScale, 420 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier));
-                } else if (extraSmiley == 3)
+                } else if (extraSmiley == 2)
                 {
                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(500 * resScale, 420 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier));
                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(510 * resScale, 310 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier));
@@ -658,7 +688,7 @@ namespace TheGame
 
         void BackToMenu()
         {
-            int windowTitleThing = new Random().Next(1, 14);
+            int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
             {
                 case 1:
@@ -674,7 +704,7 @@ namespace TheGame
                     Window.Title = "holy moly now THIS is gaming";
                     break;
                 case 5:
-                    Window.Title = "you know what to do.";
+                    Window.Title = "you know what you have to do.";
                     break;
                 case 6:
                     Window.Title = "in what universe?";
@@ -692,13 +722,31 @@ namespace TheGame
                     Window.Title = "minecraft.exe";
                     break;
                 case 11:
-                    Window.Title = "huh, it really DOES look like spain.";
+                    Window.Title = "It looks like spain";
                     break;
                 case 12:
-                    Window.Title = "greens-kun";
+                    Window.Title = "KILL THE IMPOSTOR!!!!!";
                     break;
                 case 13:
-                    Window.Title = "KILL THE IMPOSTOR!!!!!";
+                    Window.Title = "shoutout stack overflow for free code";
+                    break;
+                case 14:
+                    Window.Title = "woooo, monogame!";
+                    break;
+                case 15:
+                    Window.Title = "only the funniest";
+                    break;
+                case 16:
+                    Window.Title = "minecraft.exe";
+                    break;
+                case 17:
+                    Window.Title = "huh, it really DOES look like spain.";
+                    break;
+                case 18:
+                    Window.Title = "greens-kun";
+                    break;
+                default:
+                    Window.Title = "sample text";
                     break;
             }
             isInMainMenu = true;
@@ -749,6 +797,7 @@ namespace TheGame
         void ClearEnemies()
         {
             smileys.Clear();
+            bullets.Clear();
         }
 
         protected override void Draw(GameTime gameTime)
@@ -784,7 +833,7 @@ namespace TheGame
                     Rectangle mapRect = new Rectangle(0 * resScale, 0 * resScale, mapSprite.Width / 2 * resScale, mapSprite.Height / 2 * resScale);
                     if (inSingleplayer)
                     {
-                        redguyMapRect = new Rectangle((int)mapPos.X, (int)mapPos.Y, playerOneSprite.Width * resScale, playerOneSprite.Height * resScale);
+                        redguyMapRect = new Rectangle((int)mapPos.X, (int)mapPos.Y, redguySprite.Width * resScale, redguySprite.Height * resScale);
                     }
                     if (inCoop)
                     {
@@ -810,11 +859,11 @@ namespace TheGame
                     {
                         if (mousePos.X < mapPos.X + 7 * resScale)
                         {
-                            _spriteBatch.Draw(playerOneFlipped, redguyMapRect, Color.White);
+                            _spriteBatch.Draw(redguyFlipped, redguyMapRect, Color.White);
                         }
                         else
                         {
-                            _spriteBatch.Draw(playerOneSprite, redguyMapRect, Color.White);
+                            _spriteBatch.Draw(redguySprite, redguyMapRect, Color.White);
                         }
                     }
                     if (inCoop)
@@ -834,27 +883,32 @@ namespace TheGame
                     if (inSingleplayer)
                     {
                         //Declaring Rectangles and whatnot
-                        redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, playerOneSprite.Width * (3 * resScale), playerOneSprite.Height * (3 * resScale));
-                        Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, playerOneDodgeSprite.Width * (3 * resScale), playerOneDodgeSprite.Height * (3 * resScale));
+                        redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * (3 * resScale), redguySprite.Height * (3 * resScale));
+                        redguyHead = new Rectangle((int)redguyPos.X + 2 * resScale, (int)redguyPos.Y + 2 * resScale, redguySprite.Width * (3 * resScale) - 5 * resScale, redguySprite.Height * (3 * resScale) - 50 * resScale);
+                        redguyBody = new Rectangle((int)redguyPos.X + 2 * resScale, (int)redguyPos.Y + 30 * resScale, redguySprite.Width * (3 * resScale) - 10 * resScale, redguySprite.Height * (3 * resScale) - 35 * resScale);
+                        Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguyDodgeSprite.Width * (3 * resScale), redguyDodgeSprite.Height * (3 * resScale));
 
                         //Background drawing
 
                         // Player
                         if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimer + redInvulnTime)
                         {
-                            _spriteBatch.Draw(playerOneSprite, redguyRect, Color.White);
+                            _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
                         }
                         else
                         {
-                            _spriteBatch.Draw(playerOneDodgeSprite, redguyDodgeRect, Color.White);
+                            _spriteBatch.Draw(redguyDodgeSprite, redguyDodgeRect, Color.White);
                         }
+                        //_spriteBatch.Draw(bulletSprite, redguyHead, Color.White);
+                        //_spriteBatch.Draw(bulletSprite, redguyBody, Color.White);
 
-                        // Enemies{
+                        // Enemies
                         for (int i = 0; i < smileys.Count; i++)
                         {
                             smileys[i].Draw(_spriteBatch);
                         }
                     }
+                    // Bullets
                     for (int i = 0; i < bullets.Count; i++)
                     {
                         bullets[i].Draw(_spriteBatch);
