@@ -9,7 +9,7 @@ namespace TheGame
     class Smiley
     {
         public double moveStart = 0;
-        double moveDelay = 250;
+        double moveDelay = 300;
         bool canDoAction = true;
         double timeSinceLastAction = 0;
         int randomNumberToSix;
@@ -44,7 +44,7 @@ namespace TheGame
                 timeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
                 canDoAction = false;
             }
-            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 750)
+            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 500)
             {
                 randomNumberToSix = new Random().Next(1, 7);
                 canDoAction = true;

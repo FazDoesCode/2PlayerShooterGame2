@@ -470,7 +470,7 @@ namespace TheGame
                             for (int i = 0; i < smileys.Count; i++)
                             {
                                 smileys[i].EnemyAction(gameTime);
-                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y)
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X)
                                 {
                                     smileys[i].Charge();
                                 }
@@ -504,7 +504,7 @@ namespace TheGame
                         {
                             for (int i = 0; i < smileyCheiftain.Count; i++)
                             {
-                                smileyCheiftain[i].EnemyAction();
+                                smileyCheiftain[i].EnemyAction(gameTime);
                                 for (int b = 0; b < bullets.Count; b++)
                                 {
                                     if (bullets[b].bulletRect.Intersects(smileyCheiftain[i].rectangle))
@@ -525,7 +525,7 @@ namespace TheGame
                             for (int i = 0; i < smileys.Count; i++)
                             {
                                 smileys[i].EnemyAction(gameTime);
-                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y)
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X)
                                 {
                                     smileys[i].Charge();
                                 }
@@ -744,11 +744,20 @@ namespace TheGame
                 smileyCheiftain.Add(new SmileyChieftain(smileyChieftanSprite, new Vector2(570 * resScale, 240 * resScale), resScale, 20 * healthMultiplier));
                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(500 * resScale, 420 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier, 4));
                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(510 * resScale, 310 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier, 4));
+                for (int i = 0; i < smileys.Count; i++)
+                {
+                    smileys[i].moveStart = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+                for (int i = 0; i < smileyCheiftain.Count; i++)
+                {
+                     smileyCheiftain[i].moveStart = gameTime.TotalGameTime.TotalMilliseconds;
+                }
             }
         }
 
         void EndCombat(GameTime gameTime)
         {
+            bullets.Clear();
             timeSinceLastEncounter = gameTime.TotalGameTime.TotalMilliseconds;
             enemyToFight = 0;
             inCombat = false;
