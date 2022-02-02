@@ -25,6 +25,10 @@ namespace TheGame
         Texture2D mainMenuSprite;
         Texture2D controlsScreen;
         Texture2D mapSprite;
+        Texture2D plainsBackgroundSprite;
+        Texture2D desertBackgroundSprite;
+        Texture2D snowBackgroundSprite;
+        Texture2D swampBackgroundSprite;
         
         //Declaring Buttons
         Texture2D oneButton;
@@ -46,11 +50,13 @@ namespace TheGame
 
         //Declaring Enemies
         Texture2D smileyEnemySprite;
+        Texture2D smileyChieftanSprite;
 
         // Declaring misc
         Texture2D mountainSprite;
         Texture2D gateSprite;
         Texture2D bulletSprite;
+        Texture2D cloudSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -247,6 +253,10 @@ namespace TheGame
             mainMenuSprite = Content.Load<Texture2D>("Backgrounds/mainmenu");
             controlsScreen = Content.Load<Texture2D>("Backgrounds/Controlsscreen");
             mapSprite = Content.Load<Texture2D>("Backgrounds/map");
+            plainsBackgroundSprite = Content.Load<Texture2D>("Backgrounds/plainsbackground");
+            desertBackgroundSprite = Content.Load<Texture2D>("Backgrounds/desertbackground");
+            snowBackgroundSprite = Content.Load<Texture2D>("Backgrounds/snowbackground");
+            swampBackgroundSprite = Content.Load<Texture2D>("Backgrounds/swampbackground");
 
             //Buttons
             oneButton = Content.Load<Texture2D>("Items/1xbutton");
@@ -268,9 +278,11 @@ namespace TheGame
 
             //Enemies
             smileyEnemySprite = Content.Load<Texture2D>("Enemies/Smiley");
+            smileyChieftanSprite = Content.Load<Texture2D>("Enemies/SmileyChieftain");
 
             //Misc
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
+            cloudSprite = Content.Load<Texture2D>("Scenery/cloud");
             gateSprite = Content.Load<Texture2D>("Scenery/gatewip");
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
         }
@@ -880,6 +892,12 @@ namespace TheGame
                 }
                 if (inCombat)
                 {
+                    // Drawing maps
+                    Rectangle plainsMapRect = new Rectangle(0, 0, plainsBackgroundSprite.Width * resScale, plainsBackgroundSprite.Height * resScale);
+                    if (isInPlains)
+                    {
+                        _spriteBatch.Draw(plainsBackgroundSprite, plainsMapRect, Color.White);
+                    }
                     if (inSingleplayer)
                     {
                         //Declaring Rectangles and whatnot
