@@ -121,18 +121,6 @@
 /processorParam:TextureFormat=Color
 /build:Enemies/Smiley.png
 
-#begin Enemies/Smiley.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Enemies/Smiley.png
-
 #begin Enemies/SmileyChieftain.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -144,18 +132,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Enemies/SmileyChieftain.png
-
-#begin Enemies/YellowguyARMS.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Enemies/YellowguyARMS.png
 
 #begin Enemies/YellowguyARMS.png
 /importer:TextureImporter
@@ -422,6 +398,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Scenery/Mountain.png
+
+#begin Scenery/store.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Scenery/store.png
 
 #begin sound effects/bang.mp3
 /importer:Mp3Importer

@@ -15,6 +15,7 @@ namespace TheGame
         int randomNumberToSix;
 
         public int health;
+        public int speed;
 
         bool canCharge = true;
         bool isCharging = false;
@@ -26,13 +27,14 @@ namespace TheGame
         public Rectangle smileyRect;
         int scale;
 
-        public Smiley(Texture2D smileySprite, Vector2 position, Vector2 originalPos, int scale, int health)
+        public Smiley(Texture2D smileySprite, Vector2 position, Vector2 originalPos, int scale, int health, int speed)
         {
             this.position = position;
             this.originalPos = originalPos;
             this.smileySprite = smileySprite;
             this.scale = scale;
             this.health = health;
+            this.speed = speed;
         }
 
         public void EnemyAction(GameTime gameTime)
@@ -80,7 +82,7 @@ namespace TheGame
                     {
                         if (position.X > 5 * scale)
                         {
-                            position.X -= 8 * scale;
+                            position.X -= (speed * 2) * scale;
                         }
                         if (position.X < 5 * scale)
                         {
@@ -90,7 +92,7 @@ namespace TheGame
                     {
                         if (position.X <= originalPos.X)
                         {
-                            position.X += 6 * scale;
+                            position.X += (speed * 2 - 2) * scale;
                         }
                         else
                         {
@@ -103,12 +105,12 @@ namespace TheGame
         }
         void MoveUp()
         {
-            position.Y -= 4 * scale;
+            position.Y -= speed * scale;
         }
 
         void MoveDown()
         {
-            position.Y += 4 * scale;
+            position.Y += speed * scale;
         }
 
         public void Charge()
