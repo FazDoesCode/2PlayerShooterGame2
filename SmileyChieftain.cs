@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace TheGame
@@ -9,7 +10,7 @@ namespace TheGame
     class SmileyChieftain
     {
         public double moveStart = 0;
-        double moveDelay = 300;
+        double moveDelay = 500;
         bool canDoAction = true;
         double timeSinceLastAction = 0;
         public int health;
@@ -21,7 +22,8 @@ namespace TheGame
         int scale;
 
         public bool isHyping;
-        bool isAttacking;
+        bool canHype = true;
+        double timeSinceLastHyped = 0;
 
         public SmileyChieftain(Texture2D texture, Vector2 position, int scale, int health)
         {
@@ -42,9 +44,9 @@ namespace TheGame
             {
                 randomNumberToSix = new Random().Next(1, 7);
                 canDoAction = true;
-            }
+            }   
             if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay) {
-                if (!isAttacking && !isHyping)
+                if (!isHyping)
                 {
                     if (randomNumberToSix == 1 && position.Y > 210 * scale || randomNumberToSix == 4 && position.Y > 180 * scale)
                     {
@@ -65,7 +67,33 @@ namespace TheGame
                         randomNumberToSix = 1;
                     }
                 }
+                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastHyped + 10000)
+                {
+                    canHype = true;
+                }
+                if (randomNumberToSix == 3 && canHype == true)
+                {
+                    Hype(gameTime);
+                }
+                if (isHyping)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastHyped + 5000)
+                    {
+                        isHyping = false;
+                    }
+                }
+                if (randomNumberToSix == 5)
+                {
+                    randomNumberToSix = new Random().Next(1, 7);
+                }
             }
+        }
+
+        public void Hype(GameTime gameTime)
+        {
+            canHype = false;
+            isHyping = true;
+            timeSinceLastHyped = gameTime.TotalGameTime.TotalMilliseconds;
         }
 
         public void Draw(SpriteBatch spriteBatch)

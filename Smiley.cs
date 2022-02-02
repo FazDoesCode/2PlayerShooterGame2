@@ -9,7 +9,7 @@ namespace TheGame
     class Smiley
     {
         public double moveStart = 0;
-        double moveDelay = 300;
+        double moveDelay = 500;
         bool canDoAction = true;
         double timeSinceLastAction = 0;
         int randomNumberToSix;
