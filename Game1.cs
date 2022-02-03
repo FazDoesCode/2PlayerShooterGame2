@@ -57,6 +57,7 @@ namespace TheGame
         //Declaring Enemies
         Texture2D smileyEnemySprite;
         Texture2D smileyChieftanSprite;
+        Texture2D statueEnemySprite;
 
         // Declaring misc
         Texture2D mountainSprite;
@@ -64,6 +65,7 @@ namespace TheGame
         Texture2D bulletSprite;
         Texture2D cloudSprite;
         Texture2D whiteSquareSprite;
+        Texture2D storeSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -107,6 +109,7 @@ namespace TheGame
         // 0 = none
         // 1 = smiley
         // 2 = smiley chieftain
+        // 3 = statue
         int enemyToFight = 0;
 
         // Player stuff
@@ -162,6 +165,7 @@ namespace TheGame
         public Rectangle settingsButtonRect;
         public Rectangle exitButtonRect;
         public Rectangle gateRect;
+        public Rectangle storeRect;
 
         public Rectangle plainsRect = new Rectangle(400, 0, 300, 345);
         public Rectangle snowRect= new Rectangle(100, 0, 310, 245);
@@ -303,6 +307,7 @@ namespace TheGame
             //Enemies
             smileyEnemySprite = Content.Load<Texture2D>("Enemies/Smiley");
             smileyChieftanSprite = Content.Load<Texture2D>("Enemies/SmileyChieftain");
+            statueEnemySprite = Content.Load<Texture2D>("Enemies/statue");
 
             //Misc
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
@@ -310,6 +315,7 @@ namespace TheGame
             gateSprite = Content.Load<Texture2D>("Scenery/gatewip");
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             whiteSquareSprite = Content.Load<Texture2D>("Items/whitesquare");
+            storeSprite = Content.Load<Texture2D>("Scenery/store");
         }
 
         protected override void Update(GameTime gameTime)
@@ -607,7 +613,7 @@ namespace TheGame
                                     smileys.RemoveAt(i);
                                 }
                             }
-                            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 7500 || smileys.Count <= 0)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 7500 || smileys.Count <= 0 && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 1000)
                             {
                                 int extraSmiley = new Random().Next(1, 3);
                                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 240 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
@@ -742,7 +748,7 @@ namespace TheGame
 
         void SinglePlayerEncounter(GameTime gameTime)
         {
-            if (isMapMoving)
+            if (isMapMoving && !redguyMapRect.Intersects(storeRect))
             {
                 if (isInPlains)
                 {
@@ -764,7 +770,22 @@ namespace TheGame
                     }
                 } else if (isInSnow)
                 {
-                    
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 1500)
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
+                        {
+                            int numberTo5 = new Random().Next(1, 6);
+                            if (numberTo5 == 1)
+                            {
+                                SnowEncounter(gameTime);
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            else
+                            {
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                        }
+                    }
                 } else if (isInDesert)
                 {
                     
@@ -777,17 +798,18 @@ namespace TheGame
 
         void PlainsEncounter(GameTime gameTime)
         {
+            ClearEnemies();
             isMapMoving = false;
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
             inWorldMap = false;
             inCombat = true;
-            int etf = new Random().Next(1, 11);
-            if (etf <= 6)
+            int etf = new Random().Next(1, 101);
+            if (etf <= 60)
             {
                 enemyToFight = 1;
-            } else if (etf >= 7) {
+            } else if (etf >= 61) {
                 enemyToFight = 2;
             }
             if (enemyToFight == 1)
@@ -830,9 +852,20 @@ namespace TheGame
             }
         }
 
+        void SnowEncounter(GameTime gameTime)
+        {
+            ClearEnemies();
+            isMapMoving = false;
+            redguyPos = new Vector2(162 * resScale, 258 * resScale);
+            blueguyPos = new Vector2(60 * resScale, 330 * resScale);
+            lastKnownPos = mapPos;
+            inWorldMap = false;
+            inCombat = true;
+        }
+
         void EndCombat(GameTime gameTime)
         {
-            bullets.Clear();
+            ClearEnemies();
             timeSinceLastEncounter = gameTime.TotalGameTime.TotalMilliseconds;
             enemyToFight = 0;
             inCombat = false;
@@ -842,7 +875,6 @@ namespace TheGame
             blueguyHealth = 3;
             ClearScenery();
             SpawnScenery();
-            ClearEnemies();
         }
 
         void ForceEncounter(GameTime gameTime)
@@ -853,7 +885,7 @@ namespace TheGame
             }
             else if (isInSnow)
             {
-
+                SnowEncounter(gameTime);
             }
             else if (isInDesert)
             {
@@ -1035,6 +1067,9 @@ namespace TheGame
                         mountains[i].Draw(_spriteBatch);
                     }
                     // Buildings / Scenery
+                    storeRect = new Rectangle(570 * resScale, 165 * resScale, storeSprite.Width * resScale, storeSprite.Height * resScale);
+                    _spriteBatch.Draw(whiteSquareSprite, new Rectangle(565 * resScale, 202 * resScale, (storeSprite.Width + 10) * resScale, 10 * resScale), new Color(Color.Black, 75));
+                    _spriteBatch.Draw(storeSprite, storeRect, Color.White);
                     if (inSingleplayer)
                     {
                         if (mousePos.X < mapPos.X + 7 * resScale)
@@ -1044,6 +1079,10 @@ namespace TheGame
                         else
                         {
                             _spriteBatch.Draw(redguySprite, redguyMapRect, Color.White);
+                        }
+                        if (mapPos.Y < storeRect.Y + 13 * resScale)
+                        {
+                            _spriteBatch.Draw(storeSprite, storeRect, Color.White);
                         }
                     }
                     if (inCoop)
@@ -1061,10 +1100,13 @@ namespace TheGame
                 if (inCombat)
                 {
                     // Drawing maps
-                    Rectangle plainsMapRect = new Rectangle(0, 0, plainsBackgroundSprite.Width * resScale, plainsBackgroundSprite.Height * resScale);
+                    Rectangle combatMapRect = new Rectangle(0, 0, plainsBackgroundSprite.Width * resScale, plainsBackgroundSprite.Height * resScale);
                     if (isInPlains)
                     {
-                        _spriteBatch.Draw(plainsBackgroundSprite, plainsMapRect, Color.White);
+                        _spriteBatch.Draw(plainsBackgroundSprite, combatMapRect, Color.White);
+                    } else if (isInSnow)
+                    {
+                        _spriteBatch.Draw(snowBackgroundSprite, combatMapRect, Color.White);
                     }
                     if (inSingleplayer)
                     {
