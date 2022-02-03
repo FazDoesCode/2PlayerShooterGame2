@@ -20,6 +20,7 @@ namespace TheGame
         Texture2D texture;
         public Rectangle rectangle;
         int scale;
+        Rectangle visualRectangle;
 
         public bool isHyping;
         bool canHype = true;
@@ -71,9 +72,18 @@ namespace TheGame
                 {
                     canHype = true;
                 }
-                if (randomNumberToSix == 3 && canHype == true)
+                if (randomNumberToSix == 3 && canHype)
                 {
                     Hype(gameTime);
+                    canDoAction = true;
+                }
+                else if (randomNumberToSix == 3 && !canHype)
+                {
+                    randomNumberToSix = new Random().Next(1, 7);
+                }
+                else if (randomNumberToSix == 5)
+                {
+                    timeSinceLastAction = timeSinceLastAction - 250;
                 }
                 if (isHyping)
                 {
@@ -81,10 +91,6 @@ namespace TheGame
                     {
                         isHyping = false;
                     }
-                }
-                if (randomNumberToSix == 5)
-                {
-                    randomNumberToSix = new Random().Next(1, 7);
                 }
             }
         }
@@ -98,8 +104,10 @@ namespace TheGame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            rectangle = new Rectangle((int)position.X, (int)position.Y, (int)texture.Width * 4 * scale, (int)texture.Height * 4 * scale);
-            spriteBatch.Draw(texture, rectangle, Color.White);
+            rectangle = new Rectangle((int)position.X, (int)position.Y + 10 * scale, (int)texture.Width * 4 * scale, (int)texture.Height * 3 * scale);
+            visualRectangle = new Rectangle((int)position.X, (int)position.Y, (int)texture.Width * 4 * scale, (int)texture.Height * 4 * scale);
+            spriteBatch.Draw(texture, visualRectangle, Color.White);
+            //spriteBatch.Draw(texture, rectangle, Color.Green);
         }
     }
 }

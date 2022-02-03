@@ -51,6 +51,8 @@ namespace TheGame
         Texture2D redguyHurt2;
         Texture2D blueguyHurt1;
         Texture2D blueguyHurt2;
+        Texture2D redguyHurt1Dodge;
+        Texture2D redguyHurt2Dodge;
 
         //Declaring Enemies
         Texture2D smileyEnemySprite;
@@ -295,7 +297,8 @@ namespace TheGame
             redguyHurt2 = Content.Load<Texture2D>("Players/redguyhurt2");
             blueguyHurt1 = Content.Load<Texture2D>("Players/blueguyhurt1");
             blueguyHurt2 = Content.Load<Texture2D>("Players/blueguyhurt2");
-
+            redguyHurt1Dodge = Content.Load<Texture2D>("Players/redguyhurt1dodge");
+            redguyHurt2Dodge = Content.Load<Texture2D>("Players/redguyhurt2dodge");
 
             //Enemies
             smileyEnemySprite = Content.Load<Texture2D>("Enemies/Smiley");
@@ -604,7 +607,7 @@ namespace TheGame
                                     smileys.RemoveAt(i);
                                 }
                             }
-                            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 13000)
+                            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 7500 || smileys.Count <= 0)
                             {
                                 int extraSmiley = new Random().Next(1, 3);
                                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 240 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
@@ -839,6 +842,7 @@ namespace TheGame
             blueguyHealth = 3;
             ClearScenery();
             SpawnScenery();
+            ClearEnemies();
         }
 
         void ForceEncounter(GameTime gameTime)
@@ -1090,7 +1094,18 @@ namespace TheGame
                         }
                         else
                         {
-                            _spriteBatch.Draw(redguyDodgeSprite, redguyDodgeRect, Color.White);
+                            if (redguyHealth >= 3)
+                            {
+                                _spriteBatch.Draw(redguyDodgeSprite, redguyDodgeRect, Color.White);
+                            }
+                            else if (redguyHealth == 2)
+                            {
+                                _spriteBatch.Draw(redguyHurt1Dodge, redguyDodgeRect, Color.White);
+                            }
+                            else if (redguyHealth <= 1)
+                            {
+                                _spriteBatch.Draw(redguyHurt2Dodge, redguyDodgeRect, Color.White);
+                            }
                         }
                         //_spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
                         //_spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Green);
@@ -1103,6 +1118,16 @@ namespace TheGame
                         for (int i = 0; i < smileys.Count; i++)
                         {
                             smileys[i].Draw(_spriteBatch);
+                        }
+                        for (int i = 0; i < smileyCheiftain.Count; i++)
+                        {
+                            if (smileyCheiftain[i].isHyping)
+                            {
+                                for (int s = 0; s < smileys.Count; s++)
+                                {
+                                    _spriteBatch.Draw(smileyEnemySprite, smileys[s].smileyRect, Color.Red);
+                                }
+                            }
                         }
                     }
                     // Bullets
