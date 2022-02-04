@@ -49,11 +49,11 @@ namespace TheGame
             if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay) {
                 if (!isHyping)
                 {
-                    if (randomNumberToSix == 1 && position.Y > 210 * scale || randomNumberToSix == 4 && position.Y > 180 * scale)
+                    if (randomNumberToSix == 1 && position.Y > 190 * scale || randomNumberToSix == 4 && position.Y > 190 * scale)
                     {
                         position.Y -= 3 * scale;
                     }
-                    else if (randomNumberToSix == 1 && position.Y <= 210 * scale || randomNumberToSix == 4 && position.Y <= 180 * scale)
+                    else if (randomNumberToSix == 1 && position.Y <= 190 * scale || randomNumberToSix == 4 && position.Y <= 190 * scale)
                     {
                         position.Y += 3 * scale;
                         randomNumberToSix = 2;
