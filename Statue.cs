@@ -15,17 +15,28 @@ namespace TheGame
         public int health;
         int randomNumberToSix;
 
-        bool canAttack;
+        bool canAttack = true;
         public bool isAttacking = false;
+        public double attackTimerStart;
+        public double chargeUpTime = 750;
+        public Rectangle chargeupRect;
+        public Rectangle beamRect;
+        Texture2D chargeUpSprite;
+        Texture2D beamSprite;
+        public bool canDoDamage = false;
+        protected Game1 game;
 
         public Vector2 position;
         Texture2D texture;
         public Rectangle rectangle;
         int scale;
 
-        public Statue(Texture2D texture, Vector2 position, int scale, int health)
+        public Statue(Game1 game, Texture2D texture, Texture2D chargeUpSprite, Texture2D beamSprite, Vector2 position, int scale, int health)
         {
+            this.game = game;
             this.texture = texture;
+            this.chargeUpSprite = chargeUpSprite;
+            this.beamSprite = beamSprite;
             this.position = position;
             this.scale = scale;
             this.health = health;
@@ -33,46 +44,112 @@ namespace TheGame
 
         public void EnemyAction(GameTime gameTime)
         {
-            if (canDoAction == true)
+            if (game.inCoop)
             {
-                timeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
-                canDoAction = false;
-            }
-            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 850)
-            {
-                randomNumberToSix = new Random().Next(1, 7);
-                canDoAction = true;
-            }
-            if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay)
-            {
+                if (isAttacking && gameTime.TotalGameTime.TotalMilliseconds > attackTimerStart + 1800)
+                {
+                    isAttacking = false;
+                    canAttack = true;
+                    randomNumberToSix = new Random().Next(1, 6);
+                }
                 if (!isAttacking)
                 {
-                    if (randomNumberToSix == 1 && position.Y > 140 * scale || randomNumberToSix == 4 && position.Y > 140 * scale)
+                    if (canDoAction == true)
                     {
-                        position.Y -= 3 * scale;
+                        timeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
+                        canDoAction = false;
                     }
-                    else if (randomNumberToSix == 1 && position.Y <= 140 * scale || randomNumberToSix == 4 && position.Y <= 140 * scale)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 850)
                     {
-                        position.Y += 3 * scale;
                         randomNumberToSix = new Random().Next(1, 7);
+                        canDoAction = true;
                     }
-                    if (randomNumberToSix == 2 && position.Y < 300 * scale || randomNumberToSix == 6 && position.Y < 300 * scale)
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay)
+                {
+                    if (!isAttacking)
                     {
-                        position.Y += 3 * scale;
+                        if (randomNumberToSix == 1 && position.Y > 140 * scale || randomNumberToSix == 4 && position.Y > 140 * scale)
+                        {
+                            position.Y -= 3 * scale;
+                        }
+                        else if (randomNumberToSix == 1 && position.Y <= 140 * scale || randomNumberToSix == 4 && position.Y <= 140 * scale)
+                        {
+                            position.Y += 3 * scale;
+                            randomNumberToSix = new Random().Next(1, 6);
+                        }
+                        if (randomNumberToSix == 2 && position.Y < 300 * scale || randomNumberToSix == 3 && position.Y < 300 * scale)
+                        {
+                            position.Y += 3 * scale;
+                        }
+                        else if (randomNumberToSix == 2 && position.Y >= 300 * scale || randomNumberToSix == 3 && position.Y >= 300 * scale)
+                        {
+                            position.Y -= 3 * scale;
+                            randomNumberToSix = new Random().Next(1, 6);
+                        }
                     }
-                    else if (randomNumberToSix == 2 && position.Y >= 300 * scale || randomNumberToSix == 6 && position.Y >= 300 * scale)
+                    if (randomNumberToSix == 6 && canAttack)
                     {
-                        position.Y -= 3 * scale;
-                        randomNumberToSix = new Random().Next(1, 7);
+                        Attack(gameTime);
+                    }
+                }
+            }
+            else if (game.inSingleplayer)
+            {
+                if (isAttacking && gameTime.TotalGameTime.TotalMilliseconds > attackTimerStart + 1800)
+                {
+                    isAttacking = false;
+                    canAttack = true;
+                }
+                if (canDoAction == true)
+                {
+                    timeSinceLastAction = gameTime.TotalGameTime.TotalMilliseconds;
+                    canDoAction = false;
+                }
+                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 850)
+                {
+                    if (!isAttacking)
+                    {
+                        if (game.redguyPos.Y + 10 * scale > position.Y + 65 * scale)
+                        {
+                            position.Y += 3 * scale;
+                        }
+                        else if (game.redguyPos.Y + 10 * scale < position.Y + 65 * scale)
+                        {
+                            position.Y -= 3 * scale;
+                        }
                     }
                 }
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Attack(GameTime gameTime)
+        {
+            canDoDamage = false;
+            isAttacking = true;
+            attackTimerStart = gameTime.TotalGameTime.TotalMilliseconds;
+            canAttack = false;
+        }
+
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             rectangle = new Rectangle((int)position.X, (int)position.Y, (int)texture.Width * 2 * scale, (int)texture.Height * 2 * scale);
             spriteBatch.Draw(texture, rectangle, Color.White);
+
+            if (isAttacking)
+            {
+                if (gameTime.TotalGameTime.TotalMilliseconds < attackTimerStart + chargeUpTime)
+                {
+                    chargeupRect = new Rectangle((int)position.X - 70 * scale, (int)position.Y + 55 * scale, (int)chargeUpSprite.Width * 3 * scale, (int)chargeUpSprite.Height * 3 * scale);
+                    spriteBatch.Draw(chargeUpSprite, chargeupRect, Color.White);
+                } else if (gameTime.TotalGameTime.TotalMilliseconds > attackTimerStart + chargeUpTime)
+                {
+                    beamRect = new Rectangle(0, (int)position.Y + 64 * scale, beamSprite.Width * 7 * scale, (beamSprite.Height - 4 * scale) * 3 * scale);
+                    spriteBatch.Draw(beamSprite, beamRect, Color.White);
+                    spriteBatch.Draw(chargeUpSprite, chargeupRect, Color.White);
+                    canDoDamage = true;
+                }
+            }
         }
 
     }
