@@ -133,9 +133,6 @@ namespace TheGame
         double redLastIncrement;
         double blueLastIncrement;
 
-        int goldWon;
-        int playerGold = 0;
-
         // Position & walking stuff
         public Vector2 redguyPos = new Vector2(162, 258);
         public Vector2 blueguyPos = new Vector2(60, 330);
@@ -559,7 +556,7 @@ namespace TheGame
                                 }
                                 if (smileys.Count <= 0)
                                 {
-                                    AddGold();
+                                    AddCoin();
                                     EndCombat(gameTime);
                                 }
                             }
@@ -591,7 +588,7 @@ namespace TheGame
                                 }
                                 if (smileyCheiftain.Count <= 0)
                                 {
-                                    AddGold();
+                                    AddCoin();
                                     EndCombat(gameTime);
                                 }
                                 if (smileyCheiftain.Count > 0)
@@ -673,7 +670,7 @@ namespace TheGame
                                 }
                                 if (statues.Count <= 0)
                                 {
-                                    AddGold();
+                                    AddCoin();
                                     EndCombat(gameTime);
                                 }
                                 if (statues.Count > 0)
@@ -950,7 +947,8 @@ namespace TheGame
             SpawnScenery();
         }
 
-        void AddGold()
+        // MAKE THIS NOT SHIT
+        void AddCoin()
         {
             // Enemy to fight values:
             // 0 = none
@@ -961,17 +959,11 @@ namespace TheGame
             // 5 = frog
             if (enemyToFight == 1)
             {
-                goldWon = new Random().Next(1, 4);
-                playerGold += goldWon;
             } else if (enemyToFight == 2)
             {
-                goldWon = new Random().Next(3, 7);
-                playerGold += goldWon;
             }
             else if (enemyToFight == 3)
             {
-                goldWon = new Random().Next(7, 11);
-                playerGold += goldWon;
             }
         }
 
@@ -997,6 +989,11 @@ namespace TheGame
 
         void BackToMenu()
         {
+            // TEMPORARY SOLUTION, BUILD A BETTER ONE
+            if (redguyHealth == 0)
+            {
+                mapPos = new Vector2(390 * resScale, 225 * resScale);
+            }
             int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
             {
