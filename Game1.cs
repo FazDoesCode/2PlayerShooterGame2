@@ -114,6 +114,8 @@ namespace TheGame
         // 1 = smiley
         // 2 = smiley chieftain
         // 3 = statue
+        // 4 = troll
+        // 5 = frog
         int enemyToFight = 0;
 
         // Player stuff
@@ -777,6 +779,7 @@ namespace TheGame
             redInvulnTimerD = gameTime.TotalGameTime.TotalMilliseconds;
             redIsDodging = true;
             redIsDodging = false;
+            healthFlashR = 0;
         }
 
         void SinglePlayerEncounter(GameTime gameTime)
@@ -839,10 +842,10 @@ namespace TheGame
             inWorldMap = false;
             inCombat = true;
             int etf = new Random().Next(1, 101);
-            if (etf <= 60)
+            if (etf <= 70)
             {
                 enemyToFight = 1;
-            } else if (etf >= 61) {
+            } else if (etf >= 71) {
                 enemyToFight = 2;
             }
             if (enemyToFight == 1)
@@ -1169,7 +1172,10 @@ namespace TheGame
                                     healthFlashR = healthFlashR - 10;
                                     redLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
                                 }
-                                _spriteBatch.Draw(redguyHurt1, redguyRect, new Color(Color.Red, healthFlashR));
+                                if (healthFlashR >= 0)
+                                {
+                                    _spriteBatch.Draw(redguyHurt1, redguyRect, new Color(Color.Red, healthFlashR));
+                                }
                             }
                             else if (redguyHealth <= 1)
                             {
@@ -1179,7 +1185,10 @@ namespace TheGame
                                     healthFlashR = healthFlashR - 10;
                                     redLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
                                 }
-                                _spriteBatch.Draw(redguyHurt2, redguyRect, new Color(Color.Red, healthFlashR));
+                                if (healthFlashR >= 0)
+                                {
+                                    _spriteBatch.Draw(redguyHurt2, redguyRect, new Color(Color.Red, healthFlashR));
+                                }
                             }
                         }
                         else
@@ -1197,7 +1206,7 @@ namespace TheGame
                                 _spriteBatch.Draw(redguyHurt2Dodge, redguyDodgeRect, Color.White);
                             }
                         }
-                        //_spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
+                        //_spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Green);
                         //_spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Green);
 
                         // Enemies
