@@ -119,6 +119,15 @@ namespace TheGame
         // 5 = frog
         int enemyToFight = 0;
 
+        bool hasFought1 = false;
+        bool hasFought2 = false;
+        bool hasFought3 = false;
+        bool hasFought4 = false;
+        bool hasFought5 = false;
+        bool hasFought6 = false;
+        bool hasFought7 = false;
+        bool hasFought8 = false;
+
         // Player stuff
         int redguyHealth;
         int blueguyHealth;
@@ -132,6 +141,8 @@ namespace TheGame
         int healthFlashB = 250;
         double redLastIncrement;
         double blueLastIncrement;
+
+        int playerCoins = 0;
 
         // Position & walking stuff
         public Vector2 redguyPos = new Vector2(162, 258);
@@ -947,7 +958,6 @@ namespace TheGame
             SpawnScenery();
         }
 
-        // MAKE THIS NOT SHIT
         void AddCoin()
         {
             // Enemy to fight values:
@@ -959,11 +969,26 @@ namespace TheGame
             // 5 = frog
             if (enemyToFight == 1)
             {
+                if (!hasFought1)
+                {
+                    hasFought1 = true;
+                    playerCoins++;
+                }
             } else if (enemyToFight == 2)
             {
+                if (!hasFought2)
+                {
+                    hasFought2 = true;
+                    playerCoins++;
+                }
             }
             else if (enemyToFight == 3)
             {
+                if (!hasFought3)
+                {
+                    hasFought3 = true;
+                    playerCoins++;
+                }
             }
         }
 
