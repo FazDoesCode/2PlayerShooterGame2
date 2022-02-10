@@ -30,7 +30,9 @@ namespace TheGame
         Texture2D snowBackgroundSprite;
         Texture2D swampBackgroundSprite;
         Texture2D shopBackgroundSprite;
-        Texture2D shockCounterSprite;
+        Texture2D shopCounterSprite;
+        Texture2D encounterBonusText;
+        Texture2D youWonText;
         
         //Declaring Buttons
         Texture2D oneButton;
@@ -62,6 +64,8 @@ namespace TheGame
         Texture2D statueEnemySprite;
         Texture2D chargeUpSprite;
         Texture2D beamSprite;
+        Texture2D trollSprite;
+        Texture2D rockSprite;
 
         // Declaring misc
         Texture2D mountainSprite;
@@ -70,6 +74,7 @@ namespace TheGame
         Texture2D cloudSprite;
         Texture2D whiteSquareSprite;
         Texture2D storeSprite;
+        Texture2D coinSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -77,6 +82,7 @@ namespace TheGame
         List<Smiley> smileys = new List<Smiley>();
         List<SmileyChieftain> smileyCheiftain = new List<SmileyChieftain>();
         List<Statue> statues = new List<Statue>();
+        List<Rectangle> coinSprites = new List<Rectangle>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -106,6 +112,16 @@ namespace TheGame
         bool isInSwamp = false;
         double timeSinceLastEncounter = 0;
         double timeSinceLastEncounterAttempt = 0;
+
+        double timeSinceLastWon;
+        bool addedCoin;
+        bool canCombatMove = true;
+        bool wonCurrentEncounter = false;
+
+        // Store stuff
+        bool inStore = false;
+        Rectangle storeBackgroundRect;
+        Rectangle storeCounterRect;
 
         // Enemies
         int healthMultiplier = 1;
@@ -143,6 +159,7 @@ namespace TheGame
         double blueLastIncrement;
 
         int playerCoins = 0;
+        int coinDistance;
 
         // Position & walking stuff
         public Vector2 redguyPos = new Vector2(162, 258);
@@ -307,7 +324,9 @@ namespace TheGame
             snowBackgroundSprite = Content.Load<Texture2D>("Backgrounds/snowbackground");
             swampBackgroundSprite = Content.Load<Texture2D>("Backgrounds/swampbackground");
             shopBackgroundSprite = Content.Load<Texture2D>("Backgrounds/shopbackground");
-            shockCounterSprite = Content.Load<Texture2D>("Backgrounds/shopcounter");
+            shopCounterSprite = Content.Load<Texture2D>("Backgrounds/shopcounter");
+            encounterBonusText = Content.Load<Texture2D>("Backgrounds/EncounterBonusText");
+            youWonText = Content.Load<Texture2D>("Backgrounds/YouWonText");
 
             //Buttons
             oneButton = Content.Load<Texture2D>("Items/1xbutton");
@@ -339,6 +358,8 @@ namespace TheGame
             statueEnemySprite = Content.Load<Texture2D>("Enemies/statue");
             chargeUpSprite = Content.Load<Texture2D>("Enemies/energybeamstart");
             beamSprite = Content.Load<Texture2D>("Enemies/energybeam");
+            trollSprite = Content.Load<Texture2D>("Enemies/troll");
+            rockSprite = Content.Load<Texture2D>("Enemies/rock");
 
             //Misc
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
@@ -347,6 +368,7 @@ namespace TheGame
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             whiteSquareSprite = Content.Load<Texture2D>("Items/whitesquare");
             storeSprite = Content.Load<Texture2D>("Scenery/store");
+            coinSprite = Content.Load<Texture2D>("Items/coin");
         }
 
         protected override void Update(GameTime gameTime)
@@ -389,6 +411,7 @@ namespace TheGame
                     mapPos.Y = mapPos.Y * resScale;
                     combatSpeed = 3 * resScale;
                     dodgeDistance = 60 * resScale;
+                    AddCoin2();
                 }
                 else if (currentRes == 2 && f4KeyWasPressed == false)
                 {
@@ -408,6 +431,7 @@ namespace TheGame
                     mapPos.Y = mapPos.Y / 2;
                     combatSpeed = 3 * resScale;
                     dodgeDistance = 60 * resScale;
+                    AddCoin2();
                 }
             }
             if (Keyboard.GetState().IsKeyUp(Keys.F4) && f4KeyWasPressed == true)
@@ -460,11 +484,11 @@ namespace TheGame
             }
             if (gameHasStarted)
             {
-                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && escapeKeyWasPressed == false && !inCombat)
+                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && escapeKeyWasPressed == false && !inCombat && !inStore)
                 {
                     escapeKeyWasPressed = true;
                     BackToMenu();
-                } else if (Keyboard.GetState().IsKeyUp(Keys.Escape) && escapeKeyWasPressed == true && !inCombat)
+                } else if (Keyboard.GetState().IsKeyUp(Keys.Escape) && escapeKeyWasPressed == true && !inCombat && !inStore)
                 {
                     escapeKeyWasPressed = false;
                 }
@@ -505,6 +529,12 @@ namespace TheGame
                         else
                         {
                             isInSwamp = false;
+                        }
+
+                        if (redguyMapRect.Intersects(storeRect) && Keyboard.GetState().IsKeyDown(interact))
+                        {
+                            inWorldMap = false;
+                            inStore = true;
                         }
 
                         if (Keyboard.GetState().IsKeyDown(Keys.K) && enterKeyWasPressed == false)
@@ -567,7 +597,21 @@ namespace TheGame
                                 }
                                 if (smileys.Count <= 0)
                                 {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
                                     AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                            }
+                            if (smileys.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
                                     EndCombat(gameTime);
                                 }
                             }
@@ -599,8 +643,11 @@ namespace TheGame
                                 }
                                 if (smileyCheiftain.Count <= 0)
                                 {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
                                     AddCoin();
-                                    EndCombat(gameTime);
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
                                 }
                                 if (smileyCheiftain.Count > 0)
                                 {
@@ -611,6 +658,18 @@ namespace TheGame
                                             smileys[s].speed = 8;
                                         }
                                     }
+                                }
+                            }
+                            if (smileyCheiftain.Count <= 0)
+                            {
+                                ClearEnemies();
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
                                 }
                             }
                             for (int i = 0; i < smileys.Count; i++)
@@ -643,15 +702,18 @@ namespace TheGame
                                     timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
                                 }
                             }
-                            if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 7500 || smileys.Count <= 0 && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 1000)
+                            if (smileyCheiftain.Count > 0)
                             {
-                                int extraSmiley = new Random().Next(1, 3);
-                                smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 380 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
-                                if (extraSmiley == 2)
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 7500 || smileys.Count <= 0 && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 1000)
                                 {
-                                    smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 340 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                                    int extraSmiley = new Random().Next(1, 3);
+                                    smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 290 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                                    if (extraSmiley == 2)
+                                    {
+                                        smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 340 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                                    }
+                                    timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
                                 }
-                                timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
                         // Statue
@@ -681,8 +743,11 @@ namespace TheGame
                                 }
                                 if (statues.Count <= 0)
                                 {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
                                     AddCoin();
-                                    EndCombat(gameTime);
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
                                 }
                                 if (statues.Count > 0)
                                 {
@@ -698,7 +763,25 @@ namespace TheGame
                                     }
                                 }
                             }
+                            if (statues.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
                         }
+                    }
+
+                    if (inStore && Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        escapeKeyWasPressed = true;
+                        inStore = false;
+                        inWorldMap = true;
                     }
                 }
             }
@@ -754,6 +837,7 @@ namespace TheGame
 
         void SPCombatMove(GameTime gameTime)
         {
+            if (canCombatMove)
             if (redguyHealth >= 1)
             if (!redIsDodging)
             {
@@ -940,13 +1024,15 @@ namespace TheGame
             enemyToFight = 3;
             if (enemyToFight == 3)
             {
-                statues.Add(new Statue(this, statueEnemySprite, chargeUpSprite, beamSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 40 * healthMultiplier));
+                statues.Add(new Statue(this, statueEnemySprite, chargeUpSprite, beamSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50 * healthMultiplier));
             }
         }
 
         void EndCombat(GameTime gameTime)
         {
-            ClearEnemies();
+            wonCurrentEncounter = false;
+            canCombatMove = true;
+            addedCoin = false;
             timeSinceLastEncounter = gameTime.TotalGameTime.TotalMilliseconds;
             enemyToFight = 0;
             inCombat = false;
@@ -972,14 +1058,26 @@ namespace TheGame
                 if (!hasFought1)
                 {
                     hasFought1 = true;
+                    if (playerCoins > 0)
+                    {
+                        coinDistance += 20 * resScale;
+                    }
                     playerCoins++;
+                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                    addedCoin = true;
                 }
             } else if (enemyToFight == 2)
             {
                 if (!hasFought2)
                 {
                     hasFought2 = true;
+                    if (playerCoins > 0)
+                    {
+                        coinDistance += 20 * resScale;
+                    }
                     playerCoins++;
+                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                    addedCoin = true;
                 }
             }
             else if (enemyToFight == 3)
@@ -987,8 +1085,51 @@ namespace TheGame
                 if (!hasFought3)
                 {
                     hasFought3 = true;
+                    if (playerCoins > 0)
+                    {
+                        coinDistance += 20 * resScale;
+                    }
                     playerCoins++;
+                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                    addedCoin = true;
                 }
+            }
+        }
+
+        // FOR RESOLUTION CHANGES
+        void AddCoin2()
+        {
+            coinSprites.Clear();
+            playerCoins = 0;
+            coinDistance = 0;
+            if (hasFought1)
+            {
+                if (playerCoins > 0)
+                {
+                    coinDistance += 20;
+                }
+                playerCoins++;
+                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+            }
+
+            if (hasFought2)
+            {
+                if (playerCoins > 0)
+                {
+                    coinDistance += 20;
+                }
+                playerCoins++;
+                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+            }
+
+            if (hasFought3)
+            {
+                if (playerCoins > 0)
+                {
+                    coinDistance += 20;
+                }
+                playerCoins++;
+                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
             }
         }
 
@@ -1215,6 +1356,10 @@ namespace TheGame
                             _spriteBatch.Draw(coopMapSprite, coopMapRect, Color.White);
                         }
                     }
+                    for (int i = 0; i < coinSprites.Count; i++)
+                    {
+                        _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
+                    }
                 }
                 if (inCombat)
                 {
@@ -1290,6 +1435,18 @@ namespace TheGame
                         //_spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Green);
                     }
 
+                    if (wonCurrentEncounter)
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds < timeSinceLastWon + 2000)
+                        {
+                            _spriteBatch.Draw(youWonText, new Rectangle(0, 0, youWonText.Width * resScale, youWonText.Height * resScale), Color.White);
+                        }
+                        if (addedCoin && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && gameTime.TotalGameTime.TotalMilliseconds < timeSinceLastWon + 5000)
+                        {
+                            _spriteBatch.Draw(encounterBonusText, new Rectangle(0, 0, encounterBonusText.Width * resScale, encounterBonusText.Height * resScale), Color.White);
+                        }
+                    }
+
                     // Enemies
                     for (int i = 0; i < smileyCheiftain.Count; i++)
                     {
@@ -1317,6 +1474,18 @@ namespace TheGame
                     for (int i = 0; i < bullets.Count; i++)
                     {
                         bullets[i].Draw(_spriteBatch);
+                    }
+                }
+                if (inStore)
+                {
+                    storeBackgroundRect = new Rectangle(0, 0, shopBackgroundSprite.Width, shopBackgroundSprite.Height);
+                    storeCounterRect = new Rectangle(0, 0, shopCounterSprite.Width, shopCounterSprite.Height);
+                    _spriteBatch.Draw(shopBackgroundSprite, storeBackgroundRect, Color.White);
+
+                    _spriteBatch.Draw(shopCounterSprite, storeCounterRect, Color.White);
+                    for (int i = 0; i < coinSprites.Count; i++)
+                    {
+                        _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
                     }
                 }
             }

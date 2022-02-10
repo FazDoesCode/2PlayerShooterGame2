@@ -37,6 +37,18 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/desertbackground.png
 
+#begin Backgrounds/EncounterBonusText.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/EncounterBonusText.png
+
 #begin Backgrounds/mainmenu.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -121,6 +133,18 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/swampbackground.png
 
+#begin Backgrounds/YouWonText.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Backgrounds/YouWonText.png
+
 #begin Enemies/ChieftanAxe.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -157,6 +181,18 @@
 /processorParam:TextureFormat=Color
 /build:Enemies/energybeamstart.png
 
+#begin Enemies/rock.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Enemies/rock.png
+
 #begin Enemies/Smiley.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -192,6 +228,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Enemies/Statue.png
+
+#begin Enemies/troll.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Enemies/troll.png
 
 #begin Enemies/YellowguyARMS.png
 /importer:TextureImporter
