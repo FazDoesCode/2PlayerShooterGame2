@@ -29,6 +29,7 @@ namespace TheGame
         public Vector2 position;
         Texture2D texture;
         public Rectangle rectangle;
+        Rectangle visualRect;
         int scale;
 
         public Statue(Game1 game, Texture2D texture, Texture2D chargeUpSprite, Texture2D beamSprite, Vector2 position, int scale, int health)
@@ -133,8 +134,9 @@ namespace TheGame
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            rectangle = new Rectangle((int)position.X, (int)position.Y, (int)texture.Width * 2 * scale, (int)texture.Height * 2 * scale);
-            spriteBatch.Draw(texture, rectangle, Color.White);
+            visualRect = new Rectangle((int)position.X, (int)position.Y, (int)texture.Width * 2 * scale, (int)texture.Height * 2 * scale);
+            rectangle = new Rectangle((int)position.X, (int)position.Y + 5 * scale, (int)texture.Width * 2 * scale, (int)texture.Height * 2 * scale - 10 * scale);
+            spriteBatch.Draw(texture, visualRect, Color.White);
 
             if (isAttacking)
             {

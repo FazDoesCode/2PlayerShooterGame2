@@ -75,6 +75,7 @@ namespace TheGame
         Texture2D whiteSquareSprite;
         Texture2D storeSprite;
         Texture2D coinSprite;
+        Texture2D shopkeeperSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -122,6 +123,9 @@ namespace TheGame
         bool inStore = false;
         Rectangle storeBackgroundRect;
         Rectangle storeCounterRect;
+
+        double timeSinceLastBob;
+        bool bobUp = true;
 
         // Enemies
         int healthMultiplier = 1;
@@ -364,11 +368,12 @@ namespace TheGame
             //Misc
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
             cloudSprite = Content.Load<Texture2D>("Scenery/cloud");
-            gateSprite = Content.Load<Texture2D>("Scenery/gatewip");
+            gateSprite = Content.Load<Texture2D>("Scenery/gate");
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             whiteSquareSprite = Content.Load<Texture2D>("Items/whitesquare");
             storeSprite = Content.Load<Texture2D>("Scenery/store");
             coinSprite = Content.Load<Texture2D>("Items/coin");
+            shopkeeperSprite = Content.Load<Texture2D>("Scenery/DSL");
         }
 
         protected override void Update(GameTime gameTime)
@@ -533,6 +538,7 @@ namespace TheGame
 
                         if (redguyMapRect.Intersects(storeRect) && Keyboard.GetState().IsKeyDown(interact))
                         {
+                            timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
                             inWorldMap = false;
                             inStore = true;
                         }
@@ -1478,10 +1484,27 @@ namespace TheGame
                 }
                 if (inStore)
                 {
-                    storeBackgroundRect = new Rectangle(0, 0, shopBackgroundSprite.Width, shopBackgroundSprite.Height);
-                    storeCounterRect = new Rectangle(0, 0, shopCounterSprite.Width, shopCounterSprite.Height);
+                    storeBackgroundRect = new Rectangle(0, 0, shopBackgroundSprite.Width * resScale, shopBackgroundSprite.Height * resScale);
+                    storeCounterRect = new Rectangle(0, 315 * resScale, shopCounterSprite.Width * resScale, shopCounterSprite.Height * resScale);
                     _spriteBatch.Draw(shopBackgroundSprite, storeBackgroundRect, Color.White);
 
+                    if (bobUp)
+                    {
+                        _spriteBatch.Draw(shopkeeperSprite, new Rectangle(480 * resScale, 68 * resScale, shopkeeperSprite.Width * resScale, shopkeeperSprite.Height * resScale), Color.White);
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastBob + 1250)
+                        {
+                            bobUp = false;
+                            timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                    } 
+                    else {
+                        _spriteBatch.Draw(shopkeeperSprite, new Rectangle(480 * resScale, 74 * resScale, shopkeeperSprite.Width * resScale, shopkeeperSprite.Height * resScale), Color.White);
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastBob + 1250)
+                        {
+                            bobUp = true;
+                            timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                    }
                     _spriteBatch.Draw(shopCounterSprite, storeCounterRect, Color.White);
                     for (int i = 0; i < coinSprites.Count; i++)
                     {
