@@ -22,8 +22,9 @@ namespace TheGame
         int scale;
         Rectangle visualRectangle;
 
+        bool firstTimeHypeCheck = true;
         public bool isHyping;
-        bool canHype = true;
+        bool canHype = false;
         double timeSinceLastHyped = 0;
 
         public SmileyChieftain(Texture2D texture, Vector2 position, int scale, int health)
@@ -47,7 +48,12 @@ namespace TheGame
                 canDoAction = true;
             }   
             if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay) {
-                if (!isHyping)
+                if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay + 1000 && firstTimeHypeCheck)
+                {
+                    canHype = true;
+                    firstTimeHypeCheck = false;
+                }
+                    if (!isHyping)
                 {
                     if (randomNumberToSix == 1 && position.Y > 190 * scale || randomNumberToSix == 4 && position.Y > 190 * scale)
                     {

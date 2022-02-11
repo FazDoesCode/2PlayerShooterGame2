@@ -18,6 +18,7 @@ namespace TheGame
         bool canAttack = true;
         double timeSinceLastAttacked;
 
+        protected Game1 game;
         public Vector2 position;
         Texture2D yetisprite;
         Texture2D rocktexture;
@@ -26,8 +27,9 @@ namespace TheGame
         Rectangle visual;
         int scale;
 
-        public Yeti(Texture2D yetisprite, Texture2D rocktexture, Vector2 position, int scale, int health)
+        public Yeti(Game1 game, Texture2D yetisprite, Texture2D rocktexture, Vector2 position, int scale, int health)
         {
+            this.game = game;
             this.yetisprite = yetisprite;
             this.rocktexture = rocktexture;
             this.position = position;
@@ -58,11 +60,11 @@ namespace TheGame
                     position.Y += 3 * scale;
                     randomNumber = new Random().Next(1, 6);
                 }
-                if (randomNumber == 2 && position.Y < 360 * scale || randomNumber == 3 && position.Y < 360 * scale)
+                if (randomNumber == 2 && position.Y < 350 * scale || randomNumber == 3 && position.Y < 350 * scale)
                 {
                     position.Y += 3 * scale;
                 }
-                else if (randomNumber == 2 && position.Y >= 360 * scale || randomNumber == 3 && position.Y >= 360 * scale)
+                else if (randomNumber == 2 && position.Y >= 350 * scale || randomNumber == 3 && position.Y >= 350 * scale)
                 {
                     position.Y -= 3 * scale;
                     randomNumber = new Random().Next(1, 6);
@@ -83,6 +85,7 @@ namespace TheGame
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             visual = new Rectangle((int)position.X, (int)position.Y, yetisprite.Width * 2 * scale, yetisprite.Height * 2 * scale);
+            hitbox = new Rectangle((int)position.X, (int)position.Y, yetisprite.Width * 2 * scale, yetisprite.Height * 2 * scale);
             spriteBatch.Draw(yetisprite, visual, Color.White);
         }
     }

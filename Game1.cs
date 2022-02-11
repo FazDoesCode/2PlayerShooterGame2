@@ -788,11 +788,43 @@ namespace TheGame
                                 }
                             }
                         }
+                        // Yeti
                         if (enemyToFight == 4)
                         {
                             for (int i = 0; i < yetis.Count; i++)
                             {
                                 yetis[i].EnemyAction(gameTime);
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(yetis[i].hitbox))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        yetis[i].health--;
+                                    }
+                                }
+                                if (yetis[i].health <= 0)
+                                {
+                                    yetis.RemoveAt(i);
+                                }
+                                if (yetis.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                            }
+                            if (yetis.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
                             }
                         }
                     }
@@ -982,7 +1014,7 @@ namespace TheGame
                 {
                     if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 2500)
                     {
-                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 2000)
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
                         {
                             int randomNumber = new Random().Next(1, 5);
                             if (randomNumber == 1)
@@ -1086,7 +1118,12 @@ namespace TheGame
             }
             else if (enemyToFight == 4)
             {
-                yetis.Add(new Yeti(yetiSprite, rockSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 30));
+                yetis.Add(new Yeti(this, yetiSprite, rockSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 30 * healthMultiplier));
+                int fiftypercent = new Random().Next(1, 11);
+                if (fiftypercent <= 5)
+                {
+                    yetis.Add(new Yeti(this, yetiSprite, rockSprite, new Vector2(600 * resScale, 200 * resScale), resScale, 30 * healthMultiplier));
+                }
             }
         }
 
@@ -1156,6 +1193,20 @@ namespace TheGame
                     addedCoin = true;
                 }
             }
+            else if (enemyToFight == 4)
+            {
+                if (!hasFought4)
+                {
+                    hasFought4 = true;
+                    if (playerCoins > 0)
+                    {
+                        coinDistance += 20;
+                    }
+                    playerCoins++;
+                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                    addedCoin = true;
+                }
+            }
         }
 
         // FOR RESOLUTION CHANGES
@@ -1185,6 +1236,15 @@ namespace TheGame
             }
 
             if (hasFought3)
+            {
+                if (playerCoins > 0)
+                {
+                    coinDistance += 20;
+                }
+                playerCoins++;
+                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+            }
+            if (hasFought4)
             {
                 if (playerCoins > 0)
                 {
