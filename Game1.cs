@@ -64,8 +64,11 @@ namespace TheGame
         Texture2D statueEnemySprite;
         Texture2D chargeUpSprite;
         Texture2D beamSprite;
-        Texture2D trollSprite;
+        Texture2D yetiSprite;
         Texture2D rockSprite;
+        Texture2D frogSprite;
+        Texture2D frogAttackingSprite;
+        Texture2D frogTongueSprite;
 
         // Declaring misc
         Texture2D mountainSprite;
@@ -84,6 +87,7 @@ namespace TheGame
         List<SmileyChieftain> smileyCheiftain = new List<SmileyChieftain>();
         List<Statue> statues = new List<Statue>();
         List<Rectangle> coinSprites = new List<Rectangle>();
+        List<Yeti> yetis = new List<Yeti>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -135,7 +139,7 @@ namespace TheGame
         // 1 = smiley
         // 2 = smiley chieftain
         // 3 = statue
-        // 4 = troll
+        // 4 = yeti
         // 5 = frog
         int enemyToFight = 0;
 
@@ -362,8 +366,11 @@ namespace TheGame
             statueEnemySprite = Content.Load<Texture2D>("Enemies/statue");
             chargeUpSprite = Content.Load<Texture2D>("Enemies/energybeamstart");
             beamSprite = Content.Load<Texture2D>("Enemies/energybeam");
-            trollSprite = Content.Load<Texture2D>("Enemies/troll");
+            yetiSprite = Content.Load<Texture2D>("Enemies/yeti");
             rockSprite = Content.Load<Texture2D>("Enemies/rock");
+            frogSprite = Content.Load<Texture2D>("Enemies/frog");
+            frogAttackingSprite = Content.Load<Texture2D>("Enemies/frogattack");
+            frogTongueSprite = Content.Load<Texture2D>("Enemies/frogtongue");
 
             //Misc
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
@@ -728,7 +735,7 @@ namespace TheGame
                             for (int i = 0; i < statues.Count; i++)
                             {
                                 statues[i].EnemyAction(gameTime);
-                                if (statues[i].position.Y + 65 * resScale == redguyPos.Y + 10 * resScale)
+                                if (statues[i].position.Y + 65 * resScale >= redguyPos.Y + 10 * resScale && statues[i].position.Y + 65 * resScale <= redguyPos.Y + 20 * resScale)
                                 {
                                     if (!statues[i].isAttacking)
                                     {
@@ -779,6 +786,13 @@ namespace TheGame
                                 {
                                     EndCombat(gameTime);
                                 }
+                            }
+                        }
+                        if (enemyToFight == 4)
+                        {
+                            for (int i = 0; i < yetis.Count; i++)
+                            {
+                                yetis[i].EnemyAction(gameTime);
                             }
                         }
                     }
@@ -844,60 +858,89 @@ namespace TheGame
         void SPCombatMove(GameTime gameTime)
         {
             if (canCombatMove)
-            if (redguyHealth >= 1)
-            if (!redIsDodging)
             {
-                if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 180 * resScale)
+                if (redguyHealth >= 1)
                 {
-                    redguyPos.Y -= combatSpeed;
-                }
-                if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 390 * resScale)
-                {
-                    redguyPos.Y += combatSpeed;
-                }
-                if (Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 1 * resScale)
-                {
-                    redguyPos.X -= combatSpeed;
-                }
-                if (Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 340 * resScale)
-                {
-                    redguyPos.X += combatSpeed;
-                }
-                if (Keyboard.GetState().IsKeyDown(redguyShoot))
-                {
-                    if (redfireDelay == false)
+                    if (!redIsDodging)
                     {
-                        bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50 * resScale, 40 * resScale), new Vector2(7 * resScale, 0), resScale));
-                        redfireDelay = true;
-                    }
-                }
-                if (Keyboard.GetState().IsKeyUp(redguyShoot))
-                {
-                    redfireDelay = false;
-                }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 180 * resScale)
+                        {
+                            redguyPos.Y -= combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 390 * resScale)
+                        {
+                            redguyPos.Y += combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 1 * resScale)
+                        {
+                            redguyPos.X -= combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 340 * resScale)
+                        {
+                            redguyPos.X += combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyShoot))
+                        {
+                            if (redfireDelay == false)
+                            {
+                                bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50 * resScale, 40 * resScale), new Vector2(7 * resScale, 0), resScale));
+                                redfireDelay = true;
+                            }
+                        }
+                        if (Keyboard.GetState().IsKeyUp(redguyShoot))
+                        {
+                            redfireDelay = false;
+                        }
 
-                // Red dodging
-                if (gameTime.TotalGameTime.TotalMilliseconds > redtimeSinceLastDodge + redDodgeDelay)
-                {
-                    if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 345 * resScale)
-                    {
-                        redguyPos.Y += dodgeDistance;
-                        RedDodge(gameTime);
-                    }
-                    if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 250 * resScale)
-                    {
-                        redguyPos.Y -= dodgeDistance;
-                        RedDodge(gameTime);
-                    }
-                    if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 245 * resScale)
-                    {
-                        redguyPos.X += dodgeDistance;
-                        RedDodge(gameTime);
-                    }
-                    if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 70 * resScale)
-                    {
-                        redguyPos.X -= dodgeDistance;
-                        RedDodge(gameTime);
+                        // Red dodging
+                        if (gameTime.TotalGameTime.TotalMilliseconds > redtimeSinceLastDodge + redDodgeDelay)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveDown))
+                            {
+                                if (redguyPos.Y <= 345 * resScale)
+                                {
+                                    redguyPos.Y += dodgeDistance;
+                                    RedDodge(gameTime);
+                                } else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveUp))
+                            {
+                                if (redguyPos.Y >= 250 * resScale)
+                                {
+                                    redguyPos.Y -= dodgeDistance;
+                                    RedDodge(gameTime);
+                                } else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveRight))
+                            {
+                                if (redguyPos.X <= 245 * resScale)
+                                {
+                                    redguyPos.X += dodgeDistance;
+                                    RedDodge(gameTime);
+                                } else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft))
+                            {
+                                if (redguyPos.X >= 70 * resScale)
+                                {
+                                    redguyPos.X -= dodgeDistance;
+                                    RedDodge(gameTime);
+                                } else
+                                {
+                                    RedDodge(gameTime);
+
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -918,18 +961,19 @@ namespace TheGame
             {
                 if (isInPlains)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 1500)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 2500)
                     {
                         if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
                         {
-                            int numberTo5 = new Random().Next(1, 6);
-                            if (numberTo5 == 1)
+                            int randomNumber = new Random().Next(1, 5);
+                            if (randomNumber == 1)
                             {
                                 PlainsEncounter(gameTime);
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                             else
                             {
+                                Debug.WriteLine("Attempted Encounter");
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -940,14 +984,15 @@ namespace TheGame
                     {
                         if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 2000)
                         {
-                            int numberTo5 = new Random().Next(1, 6);
-                            if (numberTo5 == 1)
+                            int randomNumber = new Random().Next(1, 5);
+                            if (randomNumber == 1)
                             {
                                 SnowEncounter(gameTime);
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                             else
                             {
+                                Debug.WriteLine("Attempted Encounter");
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -1027,10 +1072,21 @@ namespace TheGame
             lastKnownPos = mapPos;
             inWorldMap = false;
             inCombat = true;
-            enemyToFight = 3;
+            int etf = new Random().Next(1, 101);
+            if (etf <= 60)
+            {
+                enemyToFight = 4;
+            } else if (etf >= 61)
+            {
+                enemyToFight = 3;
+            }
             if (enemyToFight == 3)
             {
                 statues.Add(new Statue(this, statueEnemySprite, chargeUpSprite, beamSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50 * healthMultiplier));
+            }
+            else if (enemyToFight == 4)
+            {
+                yetis.Add(new Yeti(yetiSprite, rockSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 30));
             }
         }
 
@@ -1057,7 +1113,7 @@ namespace TheGame
             // 1 = smiley
             // 2 = smiley chieftain
             // 3 = statue
-            // 4 = troll
+            // 4 = yeti
             // 5 = frog
             if (enemyToFight == 1)
             {
@@ -1066,7 +1122,7 @@ namespace TheGame
                     hasFought1 = true;
                     if (playerCoins > 0)
                     {
-                        coinDistance += 20 * resScale;
+                        coinDistance += 20;
                     }
                     playerCoins++;
                     coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
@@ -1079,7 +1135,7 @@ namespace TheGame
                     hasFought2 = true;
                     if (playerCoins > 0)
                     {
-                        coinDistance += 20 * resScale;
+                        coinDistance += 20;
                     }
                     playerCoins++;
                     coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
@@ -1093,7 +1149,7 @@ namespace TheGame
                     hasFought3 = true;
                     if (playerCoins > 0)
                     {
-                        coinDistance += 20 * resScale;
+                        coinDistance += 20;
                     }
                     playerCoins++;
                     coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
@@ -1475,6 +1531,10 @@ namespace TheGame
                     for (int i = 0; i < statues.Count; i++)
                     {
                         statues[i].Draw(_spriteBatch, gameTime);
+                    }
+                    for (int i = 0; i < yetis.Count; i++)
+                    {
+                        yetis[i].Draw(_spriteBatch, gameTime);
                     }
                     // Bullets
                     for (int i = 0; i < bullets.Count; i++)

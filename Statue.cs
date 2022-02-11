@@ -25,6 +25,7 @@ namespace TheGame
         Texture2D beamSprite;
         public bool canDoDamage = false;
         protected Game1 game;
+        int speed;
 
         public Vector2 position;
         Texture2D texture;
@@ -97,7 +98,14 @@ namespace TheGame
             }
             else if (game.inSingleplayer)
             {
-                if (isAttacking && gameTime.TotalGameTime.TotalMilliseconds > attackTimerStart + 1800)
+                if (isAttacking)
+                {
+                    speed = 1;
+                } else
+                {
+                    speed = 2;
+                }
+                if (isAttacking && gameTime.TotalGameTime.TotalMilliseconds > attackTimerStart + 1300)
                 {
                     isAttacking = false;
                     canAttack = true;
@@ -109,16 +117,13 @@ namespace TheGame
                 }
                 if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAction + 850)
                 {
-                    if (!isAttacking)
+                    if (game.redguyPos.Y + 10 * scale > position.Y + 65 * scale)
                     {
-                        if (game.redguyPos.Y + 10 * scale > position.Y + 65 * scale)
-                        {
-                            position.Y += 3 * scale;
-                        }
-                        else if (game.redguyPos.Y + 10 * scale < position.Y + 65 * scale)
-                        {
-                            position.Y -= 3 * scale;
-                        }
+                        position.Y += speed * scale;
+                    }
+                    else if (game.redguyPos.Y + 10 * scale < position.Y + 65 * scale)
+                    {
+                        position.Y -= speed * scale;
                     }
                 }
             }
@@ -146,6 +151,7 @@ namespace TheGame
                     spriteBatch.Draw(chargeUpSprite, chargeupRect, Color.White);
                 } else if (gameTime.TotalGameTime.TotalMilliseconds > attackTimerStart + chargeUpTime)
                 {
+                    chargeupRect = new Rectangle((int)position.X - 70 * scale, (int)position.Y + 55 * scale, (int)chargeUpSprite.Width * 3 * scale, (int)chargeUpSprite.Height * 3 * scale);
                     beamRect = new Rectangle(0, (int)position.Y + 64 * scale, beamSprite.Width * 7 * scale, (beamSprite.Height - 4 * scale) * 3 * scale);
                     spriteBatch.Draw(beamSprite, beamRect, Color.White);
                     spriteBatch.Draw(chargeUpSprite, chargeupRect, Color.White);
