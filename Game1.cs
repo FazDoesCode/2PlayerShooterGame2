@@ -142,6 +142,9 @@ namespace TheGame
         // 3 = statue
         // 4 = yeti
         // 5 = frog
+        // 6 = mosquito
+        // 7 = desert snake
+        // 8 = scorpion
         int enemyToFight = 0;
 
         bool hasFought1 = false;
@@ -842,6 +845,44 @@ namespace TheGame
                                 }
                             }
                         }
+                        if (enemyToFight == 5)
+                        {
+                            for (int i = 0; i < frogs.Count; i++)
+                            {
+                                frogs[i].EnemyAction(gameTime);
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(frogs[i].hitbox))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        frogs[i].health -= playerDamage;
+                                    }
+                                }
+                                if (frogs[i].health <= 0)
+                                {
+                                    frogs.RemoveAt(i);
+                                }
+                                if (frogs.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                            }
+                            if (frogs.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
+                        }
                     }
 
                     if (inStore && Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -895,7 +936,7 @@ namespace TheGame
                 lastKnownPos = mapPos;
                 mapPos.X += movementX * ((float)mapSpeed * resScale);
                 mapPos.Y += movementY * ((float)mapSpeed * resScale);
-                if (distanceToTravelTotal < 1)
+                if (distanceToTravelTotal < 1 * resScale)
                 {
                     isMapMoving = false;
                 }
@@ -1167,7 +1208,7 @@ namespace TheGame
             enemyToFight = 5;
             if (enemyToFight == 5)
             {
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 10 * healthMultiplier, whiteSquareSprite));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 10 * healthMultiplier));
             }
         }
 
@@ -1251,6 +1292,20 @@ namespace TheGame
                     addedCoin = true;
                 }
             }
+            else if (enemyToFight == 5)
+            {
+                if (!hasFought5)
+                {
+                    hasFought5 = true;
+                    if (playerCoins > 0)
+                    {
+                        coinDistance += 20;
+                    }
+                    playerCoins++;
+                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                    addedCoin = true;
+                }
+            }
         }
 
         // FOR RESOLUTION CHANGES
@@ -1289,6 +1344,15 @@ namespace TheGame
                 coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
             }
             if (hasFought4)
+            {
+                if (playerCoins > 0)
+                {
+                    coinDistance += 20;
+                }
+                playerCoins++;
+                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+            }
+            if (hasFought5)
             {
                 if (playerCoins > 0)
                 {
@@ -1537,6 +1601,9 @@ namespace TheGame
                     } else if (isInSnow)
                     {
                         _spriteBatch.Draw(snowBackgroundSprite, combatMapRect, Color.White);
+                    } else if (isInSwamp)
+                    {
+                        _spriteBatch.Draw(swampBackgroundSprite, combatMapRect, Color.White);
                     }
                     if (inSingleplayer)
                     {
