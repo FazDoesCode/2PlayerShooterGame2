@@ -88,6 +88,7 @@ namespace TheGame
         List<Statue> statues = new List<Statue>();
         List<Rectangle> coinSprites = new List<Rectangle>();
         List<Yeti> yetis = new List<Yeti>();
+        List<Frog> frogs = new List<Frog>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -168,6 +169,8 @@ namespace TheGame
 
         int playerCoins = 0;
         int coinDistance;
+
+        int playerDamage = 1;
 
         // Position & walking stuff
         public Vector2 redguyPos = new Vector2(162, 258);
@@ -601,7 +604,7 @@ namespace TheGame
                                     if (bullets[b].bulletRect.Intersects(smileys[i].smileyRect))
                                     {
                                         bullets.RemoveAt(b);
-                                        smileys[i].health--;
+                                        smileys[i].health -= playerDamage;
                                     }
                                 }
                                 if (smileys[i].health <= 0)
@@ -640,7 +643,7 @@ namespace TheGame
                                     if (bullets[b].bulletRect.Intersects(smileyCheiftain[i].rectangle))
                                     {
                                         bullets.RemoveAt(b);
-                                        smileyCheiftain[i].health--;
+                                        smileyCheiftain[i].health -= playerDamage;
                                     }
                                 }
                                 if (smileyCheiftain[i].health <= 0)
@@ -706,7 +709,7 @@ namespace TheGame
                                     if (bullets[b].bulletRect.Intersects(smileys[i].smileyRect))
                                     {
                                         bullets.RemoveAt(b);
-                                        smileys[i].health--;
+                                        smileys[i].health -= playerDamage;
                                     }
                                 }
                                 if (smileys[i].health <= 0)
@@ -747,7 +750,7 @@ namespace TheGame
                                     if (bullets[b].bulletRect.Intersects(statues[i].rectangle))
                                     {
                                         bullets.RemoveAt(b);
-                                        statues[i].health--;
+                                        statues[i].health -= playerDamage;
                                     }
                                 }
                                 if (statues[i].health <= 0)
@@ -766,7 +769,7 @@ namespace TheGame
                                 {
                                     if (statues[i].isAttacking)
                                     {
-                                        if (redguyRect.Intersects(statues[i].beamRect) && statues[i].canDoDamage)
+                                        if (redguyHead.Intersects(statues[i].beamRect) && statues[i].canDoDamage || redguyBody.Intersects(statues[i].beamRect) && statues[i].canDoDamage)
                                         {
                                             if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD)
                                             {
@@ -799,7 +802,7 @@ namespace TheGame
                                     if (bullets[b].bulletRect.Intersects(yetis[i].hitbox))
                                     {
                                         bullets.RemoveAt(b);
-                                        yetis[i].health--;
+                                        yetis[i].health -= playerDamage;
                                     }
                                 }
                                 if (yetis[i].health <= 0)
@@ -813,6 +816,18 @@ namespace TheGame
                                     AddCoin();
                                     canCombatMove = false;
                                     wonCurrentEncounter = true;
+                                }
+                                if (yetis.Count > 0)
+                                {
+                                    if (redguyHead.Intersects(yetis[i].rockRect) || redguyBody.Intersects(yetis[i].rockRect))
+                                    {
+                                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                        {
+                                            redguyHealth--;
+                                            redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                            healthFlashR = 250;
+                                        }
+                                    }
                                 }
                             }
                             if (yetis.Count <= 0)
@@ -1029,10 +1044,26 @@ namespace TheGame
                             }
                         }
                     }
-                } else if (isInDesert)
-                {
-                    
                 } else if (isInSwamp)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 2500)
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
+                        {
+                            int randomNumber = new Random().Next(1, 5);
+                            if (randomNumber == 1)
+                            {
+                                SwampEncounter(gameTime);
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Attempted Encounter");
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                        }
+                    }
+                } else if (isInDesert)
                 {
 
                 }
@@ -1118,12 +1149,25 @@ namespace TheGame
             }
             else if (enemyToFight == 4)
             {
-                yetis.Add(new Yeti(this, yetiSprite, rockSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 30 * healthMultiplier));
-                int fiftypercent = new Random().Next(1, 11);
-                if (fiftypercent <= 5)
-                {
-                    yetis.Add(new Yeti(this, yetiSprite, rockSprite, new Vector2(600 * resScale, 200 * resScale), resScale, 30 * healthMultiplier));
-                }
+                yetis.Add(new Yeti(this, gameTime, yetiSprite, rockSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 30 * healthMultiplier));
+                yetis.Add(new Yeti(this, gameTime, yetiSprite, rockSprite, new Vector2(600 * resScale, 200 * resScale), resScale, 30 * healthMultiplier));
+            }
+        }
+
+        void SwampEncounter(GameTime gameTime)
+        {
+            ClearEnemies();
+            isMapMoving = false;
+            redguyPos = new Vector2(162 * resScale, 258 * resScale);
+            blueguyPos = new Vector2(60 * resScale, 330 * resScale);
+            lastKnownPos = mapPos;
+            inWorldMap = false;
+            inCombat = true;
+            int etf = new Random().Next(1, 101);
+            enemyToFight = 5;
+            if (enemyToFight == 5)
+            {
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 10 * healthMultiplier, whiteSquareSprite));
             }
         }
 
@@ -1271,7 +1315,7 @@ namespace TheGame
             }
             else if (isInSwamp)
             {
-
+                SwampEncounter(gameTime);
             }
         }
 
@@ -1595,6 +1639,10 @@ namespace TheGame
                     for (int i = 0; i < yetis.Count; i++)
                     {
                         yetis[i].Draw(_spriteBatch, gameTime);
+                    }
+                    for (int i = 0; i < frogs.Count; i++)
+                    {
+                        frogs[i].Draw(_spriteBatch, gameTime);
                     }
                     // Bullets
                     for (int i = 0; i < bullets.Count; i++)

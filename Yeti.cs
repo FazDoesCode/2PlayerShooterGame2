@@ -20,6 +20,11 @@ namespace TheGame
         double timeSinceLastAttacked;
         new Point redGuyPos;
         new Point blueGuyPos;
+        float distanceToTravelX;
+        float distanceToTravelY;
+        float distanceToTravelTotal;
+        float movementX;
+        float movementY;
 
         protected Game1 game;
         public Vector2 position;
@@ -31,7 +36,7 @@ namespace TheGame
         Rectangle visual;
         int scale;
 
-        public Yeti(Game1 game, Texture2D yetisprite, Texture2D rocktexture, Vector2 position, int scale, int health)
+        public Yeti(Game1 game, GameTime gameTime, Texture2D yetisprite, Texture2D rocktexture, Vector2 position, int scale, int health)
         {
             this.game = game;
             this.yetisprite = yetisprite;
@@ -39,6 +44,7 @@ namespace TheGame
             this.position = position;
             this.scale = scale;
             this.health = health;
+            timeSinceLastAttacked = gameTime.TotalGameTime.TotalMilliseconds;
         }
 
         public void EnemyAction(GameTime gameTime)
@@ -74,9 +80,19 @@ namespace TheGame
                     randomNumber = new Random().Next(1, 6);
                 }
 
-                if (randomNumber == 6 && canAttack)
+                if (randomNumber == 6 && canAttack || gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAttacked + 5000)
                 {
                     Attack(gameTime);
+                }
+                if (isAttacking)
+                {
+                    rockPos.X += movementX * (10 * scale);
+                    rockPos.Y += movementY * (10 * scale);
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAttacked + 2000)
+                    {
+                        isAttacking = false;
+                        canAttack = true;
+                    }
                 }
             }
         }
@@ -89,35 +105,55 @@ namespace TheGame
             {
                 if (game.redguyHealth > 0)
                 {
-                    redGuyPos.X = (int)game.redguyPos.Y;
-                    redGuyPos.X = (int)game.redguyPos.Y;
+                    redGuyPos.X = (int)game.redguyPos.X;
+                    redGuyPos.Y = (int)game.redguyPos.Y;
+
+                    distanceToTravelX = redGuyPos.X - rockPos.X;
+                    distanceToTravelY = redGuyPos.Y - rockPos.Y;
+                    distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
+                    movementX = distanceToTravelX / distanceToTravelTotal;
+                    movementY = distanceToTravelY / distanceToTravelTotal;
                 }
             }
             if (game.inCoop)
             {
-                if (game.redguyHealth > 0)
+                int randomNumber = new Random().Next(1, 101);
+                if (game.redguyHealth > 0 && randomNumber < 51)
                 {
                     redGuyPos.X = (int)game.redguyPos.Y;
                     redGuyPos.X = (int)game.redguyPos.Y;
+
+                    distanceToTravelX = redGuyPos.X - redGuyPos.X;
+                    distanceToTravelY = redGuyPos.Y - redGuyPos.Y;
+                    distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
+                    movementX = distanceToTravelX / distanceToTravelTotal;
+                    movementY = distanceToTravelY / distanceToTravelTotal;
                 }
-                if (game.blueguyHealth > 0)
+                if (game.blueguyHealth > 0 && randomNumber > 50)
                 {
                     blueGuyPos.X = (int)game.blueguyPos.X;
                     blueGuyPos.Y = (int)game.blueguyPos.Y;
+
+                    distanceToTravelX = blueGuyPos.X - blueGuyPos.X;
+                    distanceToTravelY = blueGuyPos.Y - blueGuyPos.Y;
+                    distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
+                    movementX = distanceToTravelX / distanceToTravelTotal;
+                    movementY = distanceToTravelY / distanceToTravelTotal;
                 }
             }
+            timeSinceLastAttacked = gameTime.TotalGameTime.TotalMilliseconds;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             visual = new Rectangle((int)position.X, (int)position.Y, yetisprite.Width * 2 * scale, yetisprite.Height * 2 * scale);
             hitbox = new Rectangle((int)position.X + 15 * scale, (int)position.Y, yetisprite.Width * 3 / 2 * scale, yetisprite.Height * 2 * scale);
+            rockRect = new Rectangle((int)rockPos.X, (int)rockPos.Y, rocktexture.Width * 2 * scale, rocktexture.Height * 2 * scale);
             spriteBatch.Draw(yetisprite, visual, Color.White);
             if (!isAttacking && canAttack)
             {
                 rockPos.X = position.X + 5 * scale;
                 rockPos.Y = position.Y - 60 * scale;
-                rockRect = new Rectangle((int)rockPos.X, (int)rockPos.Y, rocktexture.Width * 2 * scale, rocktexture.Height * 2 * scale);
             }
             spriteBatch.Draw(rocktexture, rockRect, Color.White);
         }
