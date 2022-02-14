@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,10 @@ namespace TheGame
         int randomNumber;
 
         bool canAttack = true;
+        bool isAttacking = false;
         double timeSinceLastAttacked;
+        new Point redGuyPos;
+        new Point blueGuyPos;
 
         protected Game1 game;
         public Vector2 position;
@@ -24,6 +27,7 @@ namespace TheGame
         Texture2D rocktexture;
         public Rectangle hitbox;
         public Rectangle rockRect;
+        Vector2 rockPos;
         Rectangle visual;
         int scale;
 
@@ -79,14 +83,43 @@ namespace TheGame
 
         public void Attack(GameTime gameTime)
         {
-
+            canAttack = false;
+            isAttacking = true;
+            if (game.inSingleplayer)
+            {
+                if (game.redguyHealth > 0)
+                {
+                    redGuyPos.X = (int)game.redguyPos.Y;
+                    redGuyPos.X = (int)game.redguyPos.Y;
+                }
+            }
+            if (game.inCoop)
+            {
+                if (game.redguyHealth > 0)
+                {
+                    redGuyPos.X = (int)game.redguyPos.Y;
+                    redGuyPos.X = (int)game.redguyPos.Y;
+                }
+                if (game.blueguyHealth > 0)
+                {
+                    blueGuyPos.X = (int)game.blueguyPos.X;
+                    blueGuyPos.Y = (int)game.blueguyPos.Y;
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             visual = new Rectangle((int)position.X, (int)position.Y, yetisprite.Width * 2 * scale, yetisprite.Height * 2 * scale);
-            hitbox = new Rectangle((int)position.X, (int)position.Y, yetisprite.Width * 2 * scale, yetisprite.Height * 2 * scale);
+            hitbox = new Rectangle((int)position.X + 15 * scale, (int)position.Y, yetisprite.Width * 3 / 2 * scale, yetisprite.Height * 2 * scale);
             spriteBatch.Draw(yetisprite, visual, Color.White);
+            if (!isAttacking && canAttack)
+            {
+                rockPos.X = position.X + 5 * scale;
+                rockPos.Y = position.Y - 60 * scale;
+                rockRect = new Rectangle((int)rockPos.X, (int)rockPos.Y, rocktexture.Width * 2 * scale, rocktexture.Height * 2 * scale);
+            }
+            spriteBatch.Draw(rocktexture, rockRect, Color.White);
         }
     }
 }

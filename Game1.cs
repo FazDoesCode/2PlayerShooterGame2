@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -153,8 +153,8 @@ namespace TheGame
         bool hasFought8 = false;
 
         // Player stuff
-        int redguyHealth;
-        int blueguyHealth;
+        public int redguyHealth;
+        public int blueguyHealth;
 
         double redInvulnTimerH;
         double blueInvulnTimerH;
