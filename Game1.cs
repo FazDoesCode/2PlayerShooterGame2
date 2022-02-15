@@ -24,6 +24,7 @@ namespace TheGame
         bool clicked;
         bool debugmode;
         bool showBoundaries;
+        bool drawhitboxes;
         bool ikeypressed = false;
 
         //Declaring Backgrounds
@@ -85,6 +86,7 @@ namespace TheGame
         Texture2D storeSprite;
         Texture2D coinSprite;
         Texture2D shopkeeperSprite;
+        Texture2D debugIndicator;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -395,6 +397,7 @@ namespace TheGame
             storeSprite = Content.Load<Texture2D>("Scenery/store");
             coinSprite = Content.Load<Texture2D>("Items/coin");
             shopkeeperSprite = Content.Load<Texture2D>("Scenery/DSL");
+            debugIndicator = Content.Load<Texture2D>("Backgrounds/debug");
         }
 
         protected override void Update(GameTime gameTime)
@@ -607,6 +610,25 @@ namespace TheGame
                     }
                     if (inCombat)
                     {
+                        if (debugmode)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
+                            {
+                                ikeypressed = true;
+                                if (!drawhitboxes)
+                                {
+                                    drawhitboxes = true;
+                                }
+                                else
+                                {
+                                    drawhitboxes = false;
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyUp(Keys.I) && ikeypressed == true)
+                            {
+                                ikeypressed = false;
+                            }
+                        }
                         if (redguyHealth <= 0)
                         {
                             //put game over here
@@ -1118,7 +1140,6 @@ namespace TheGame
                             }
                             else
                             {
-                                Debug.WriteLine("Attempted Encounter");
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -1137,7 +1158,6 @@ namespace TheGame
                             }
                             else
                             {
-                                Debug.WriteLine("Attempted Encounter");
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -1156,7 +1176,6 @@ namespace TheGame
                             }
                             else
                             {
-                                Debug.WriteLine("Attempted Encounter");
                                 timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
                             }
                         }
@@ -1445,9 +1464,11 @@ namespace TheGame
         void BackToMenu()
         {
             narb = false;
-            if (redguyHealth == 0)
+            // PUT THIS IN A GAME OVER FUNCTION
+            if (redguyHealth <= 0)
             {
                 mapPos = new Vector2(390 * resScale, 225 * resScale);
+                lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
             }
             int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
@@ -1510,7 +1531,7 @@ namespace TheGame
                     Window.Title = "sample text";
                     break;
             }
-            int randomchancexd = new Random().Next(1, 5);
+            int randomchancexd = new Random().Next(1, 501);
             if (randomchancexd == 1)
             {
                 narb = true;
@@ -1757,8 +1778,11 @@ namespace TheGame
                                 _spriteBatch.Draw(redguyHurt2Dodge, redguyDodgeRect, Color.White);
                             }
                         }
-                        //_spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Green);
-                        //_spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Green);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
+                            _spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Red);
+                        }
                     }
 
                     if (wonCurrentEncounter)
@@ -1777,10 +1801,18 @@ namespace TheGame
                     for (int i = 0; i < smileyCheiftain.Count; i++)
                     {
                         smileyCheiftain[i].Draw(_spriteBatch);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, smileyCheiftain[i].rectangle, Color.Red);
+                        }
                     }
                     for (int i = 0; i < smileys.Count; i++)
                     {
                         smileys[i].Draw(_spriteBatch);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, smileys[i].smileyRect, Color.Red);
+                        }
                     }
                     for (int i = 0; i < smileyCheiftain.Count; i++)
                     {
@@ -1795,14 +1827,26 @@ namespace TheGame
                     for (int i = 0; i < statues.Count; i++)
                     {
                         statues[i].Draw(_spriteBatch, gameTime);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, statues[i].rectangle, Color.Red);
+                        }
                     }
                     for (int i = 0; i < yetis.Count; i++)
                     {
                         yetis[i].Draw(_spriteBatch, gameTime);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, yetis[i].hitbox, Color.Red);
+                        }
                     }
                     for (int i = 0; i < frogs.Count; i++)
                     {
                         frogs[i].Draw(_spriteBatch, gameTime);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, frogs[i].hitbox, Color.Red);
+                        }
                     }
                     // Bullets
                     for (int i = 0; i < bullets.Count; i++)
@@ -1838,6 +1882,10 @@ namespace TheGame
                     {
                         _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
                     }
+                }
+                if (debugmode)
+                {
+                    _spriteBatch.Draw(debugIndicator, new Rectangle(685 * resScale, 0, debugIndicator.Width / 2 * resScale, debugIndicator.Height / 2 * resScale), Color.White);
                 }
             }
 
