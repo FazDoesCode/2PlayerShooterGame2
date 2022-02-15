@@ -845,7 +845,7 @@ namespace TheGame
                                     canCombatMove = false;
                                     wonCurrentEncounter = true;
                                 }
-                                if (yetis.Count > 0)
+                                if (yetis.Count > 0 && redguyHealth > 0)
                                 {
                                     if (redguyHead.Intersects(yetis[i].rockRect) || redguyBody.Intersects(yetis[i].rockRect))
                                     {
@@ -870,6 +870,7 @@ namespace TheGame
                                 }
                             }
                         }
+                        // Frogs
                         if (enemyToFight == 5)
                         {
                             for (int i = 0; i < frogs.Count; i++)
@@ -894,6 +895,18 @@ namespace TheGame
                                     AddCoin();
                                     canCombatMove = false;
                                     wonCurrentEncounter = true;
+                                }
+                                if (frogs.Count > 0)
+                                {
+                                    if (redguyHead.Intersects(frogs[i].tongueRect) || redguyBody.Intersects(frogs[i].tongueRect))
+                                    {
+                                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                        {
+                                            redguyHealth--;
+                                            redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                            healthFlashR = 250;
+                                        }
+                                    }
                                 }
                             }
                             if (frogs.Count <= 0)
@@ -1242,6 +1255,8 @@ namespace TheGame
             if (enemyToFight == 5)
             {
                 frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 10 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(600 * resScale, 300 * resScale), resScale, 10 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(400 * resScale, 400 * resScale), resScale, 10 * healthMultiplier));
             }
         }
 
@@ -1570,8 +1585,11 @@ namespace TheGame
                 {
                     // MAP BOUNDARIES
                     mapBoundaries.Add(new Rectangle(120 * resScale, 50 * resScale, 45 * resScale, 200 * resScale));
-                    mapBoundaries.Add(new Rectangle(145 * resScale, 240 * resScale, 40 * resScale, 200 * resScale));
-                    mapBoundaries.Add(new Rectangle(135 * resScale, 430 * resScale, 490 * resScale, 40 * resScale));
+                    mapBoundaries.Add(new Rectangle(145 * resScale, 240 * resScale, 40 * resScale, 110 * resScale));
+                    mapBoundaries.Add(new Rectangle(100 * resScale, 350 * resScale, 55 * resScale, 80 * resScale));
+                    mapBoundaries.Add(new Rectangle(135 * resScale, 430 * resScale, 115 * resScale, 40 * resScale));
+                    mapBoundaries.Add(new Rectangle(250 * resScale, 445 * resScale, 150 * resScale, 30 * resScale));
+                    mapBoundaries.Add(new Rectangle(400 * resScale, 450 * resScale, 220 * resScale, 25 * resScale));
                     mapBoundaries.Add(new Rectangle(620 * resScale, 290 * resScale, 40 * resScale, 200 * resScale));
                     mapBoundaries.Add(new Rectangle(645 * resScale, 100 * resScale, 40 * resScale, 190 * resScale));
                     mapBoundaries.Add(new Rectangle(600 * resScale, 0 * resScale, 50 * resScale, 115 * resScale));
