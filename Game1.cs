@@ -12,6 +12,8 @@ namespace TheGame
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        bool narb;
+
         int currentRes = 1;
         public int resScale = 1;
         bool escapeKeyWasPressed = false;
@@ -36,6 +38,7 @@ namespace TheGame
         Texture2D shopCounterSprite;
         Texture2D encounterBonusText;
         Texture2D youWonText;
+        Texture2D narbBackground;
         
         //Declaring Buttons
         Texture2D oneButton;
@@ -345,6 +348,7 @@ namespace TheGame
             shopCounterSprite = Content.Load<Texture2D>("Backgrounds/shopcounter");
             encounterBonusText = Content.Load<Texture2D>("Backgrounds/EncounterBonusText");
             youWonText = Content.Load<Texture2D>("Backgrounds/YouWonText");
+            narbBackground = Content.Load<Texture2D>("Backgrounds/narb");
 
             //Buttons
             oneButton = Content.Load<Texture2D>("Items/1xbutton");
@@ -461,7 +465,7 @@ namespace TheGame
                 f4KeyWasPressed = false;
             }
 
-            if(isInMainMenu == true)
+            if (isInMainMenu == true)
             {
                 if (singleplayerButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
@@ -514,7 +518,8 @@ namespace TheGame
                 {
                     escapeKeyWasPressed = true;
                     BackToMenu();
-                } else if (Keyboard.GetState().IsKeyUp(Keys.Escape) && escapeKeyWasPressed == true && !inCombat && !inStore)
+                }
+                else if (Keyboard.GetState().IsKeyUp(Keys.Escape) && escapeKeyWasPressed == true && !inCombat && !inStore)
                 {
                     escapeKeyWasPressed = false;
                 }
@@ -845,7 +850,7 @@ namespace TheGame
                                     canCombatMove = false;
                                     wonCurrentEncounter = true;
                                 }
-                                if (yetis.Count > 0 && redguyHealth > 0)
+                                if (yetis.Count > 0)
                                 {
                                     if (redguyHead.Intersects(yetis[i].rockRect) || redguyBody.Intersects(yetis[i].rockRect))
                                     {
@@ -898,14 +903,20 @@ namespace TheGame
                                 }
                                 if (frogs.Count > 0)
                                 {
-                                    if (redguyHead.Intersects(frogs[i].tongueRect) || redguyBody.Intersects(frogs[i].tongueRect))
+                                    try
                                     {
-                                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                        if (redguyHead.Intersects(frogs[i].tongueRect) || redguyBody.Intersects(frogs[i].tongueRect))
                                         {
-                                            redguyHealth--;
-                                            redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
-                                            healthFlashR = 250;
+                                            if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                            {
+                                                redguyHealth--;
+                                                redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                                healthFlashR = 250;
+                                            }
                                         }
+                                    } catch
+                                    {
+                                        return;
                                     }
                                 }
                             }
@@ -1254,9 +1265,9 @@ namespace TheGame
             enemyToFight = 5;
             if (enemyToFight == 5)
             {
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 10 * healthMultiplier));
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(600 * resScale, 300 * resScale), resScale, 10 * healthMultiplier));
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(400 * resScale, 400 * resScale), resScale, 10 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 8 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(600 * resScale, 300 * resScale), resScale, 8 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(400 * resScale, 400 * resScale), resScale, 8 * healthMultiplier));
             }
         }
 
@@ -1433,7 +1444,7 @@ namespace TheGame
 
         void BackToMenu()
         {
-            // TEMPORARY SOLUTION, BUILD A BETTER ONE
+            narb = false;
             if (redguyHealth == 0)
             {
                 mapPos = new Vector2(390 * resScale, 225 * resScale);
@@ -1498,6 +1509,12 @@ namespace TheGame
                 default:
                     Window.Title = "sample text";
                     break;
+            }
+            int randomchancexd = new Random().Next(1, 5);
+            if (randomchancexd == 1)
+            {
+                narb = true;
+                Window.Title = "NARB :DDD";
             }
             isInMainMenu = true;
             gameHasStarted = false;
@@ -1573,12 +1590,16 @@ namespace TheGame
             if (isInMainMenu)
             {
                 _spriteBatch.Draw(mainMenuSprite, mainmenuRect, Color.White);
+                if (narb)
+                {
+                    _spriteBatch.Draw(narbBackground, new Rectangle(0, -100 * resScale, 800 * resScale, 580 * resScale), Color.White);
+                }
                 _spriteBatch.Draw(singleplayerButton, singleplayerButtonRect, Color.White);
                 _spriteBatch.Draw(coopButton, coopButtonRect, Color.White);
                 _spriteBatch.Draw(settingsButton, settingsButtonRect, Color.White);
                 _spriteBatch.Draw(exitButton, exitButtonRect, Color.White);
                 _spriteBatch.Draw(oneButton, mouseRect, Color.Transparent);
-            }            
+            }
             if (gameHasStarted)
             {
                 if (inWorldMap)

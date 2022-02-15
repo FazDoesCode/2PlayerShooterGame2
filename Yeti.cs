@@ -18,8 +18,8 @@ namespace TheGame
         bool canAttack = true;
         bool isAttacking = false;
         double timeSinceLastAttacked;
-        new Point redGuyPos;
-        new Point blueGuyPos;
+        Point redGuyPos;
+        Point blueGuyPos;
         float distanceToTravelX;
         float distanceToTravelY;
         float distanceToTravelTotal;
