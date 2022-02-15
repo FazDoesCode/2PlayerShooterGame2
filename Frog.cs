@@ -206,7 +206,7 @@ namespace TheGame
                 {
                     tonguePos += 15;
                     tongueLength += 15;
-                    tongueRect = new Rectangle(((int)position.X + 22) - tonguePos, (int)position.Y + 19, tongueLength * scale, 8 * scale);
+                    tongueRect = new Rectangle(((int)position.X + 22 * scale) - tonguePos * scale, (int)position.Y + 19 * scale, tongueLength * scale, 8 * scale);
                     timeSinceLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
                 }
                 spriteBatch.Draw(frogAttackSprite, visualRect, Color.White);
