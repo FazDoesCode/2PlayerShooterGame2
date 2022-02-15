@@ -20,6 +20,9 @@ namespace TheGame
         bool isClicking = false;
         Point mousePos;
         bool clicked;
+        bool debugmode;
+        bool showBoundaries;
+        bool ikeypressed = false;
 
         //Declaring Backgrounds
         Texture2D mainMenuSprite;
@@ -89,6 +92,7 @@ namespace TheGame
         List<Rectangle> coinSprites = new List<Rectangle>();
         List<Yeti> yetis = new List<Yeti>();
         List<Frog> frogs = new List<Frog>();
+        List<Rectangle> mapBoundaries = new List<Rectangle>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -499,6 +503,10 @@ namespace TheGame
                 {
                     Exit();
                 }
+                if (Keyboard.GetState().IsKeyDown(Keys.F12))
+                {
+                    debugmode = true;
+                }
             }
             if (gameHasStarted)
             {
@@ -555,24 +563,41 @@ namespace TheGame
                             inWorldMap = false;
                             inStore = true;
                         }
-
-                        if (Keyboard.GetState().IsKeyDown(Keys.K) && enterKeyWasPressed == false)
+                        if (debugmode)
                         {
-                            enterKeyWasPressed = true;
-                            mountains.Add(new Mountain(mountainSprite, new Vector2((int)(mousePos.X - 25 * resScale), (int)(mousePos.Y - 25 * resScale)), resScale));
-                        }
-                        if (Keyboard.GetState().IsKeyUp(Keys.K) && enterKeyWasPressed == true)
-                        {
-                            enterKeyWasPressed = false;
-                        }
-                        if (Keyboard.GetState().IsKeyDown(Keys.P))
-                        {
-                            ClearScenery();
-                            SpawnScenery();
-                        }
-                        if (Keyboard.GetState().IsKeyDown(Keys.L))
-                        {
-                            ForceEncounter(gameTime);
+                            if (Keyboard.GetState().IsKeyDown(Keys.K) && enterKeyWasPressed == false)
+                            {
+                                enterKeyWasPressed = true;
+                                mountains.Add(new Mountain(mountainSprite, new Vector2((int)(mousePos.X - 25 * resScale), (int)(mousePos.Y - 25 * resScale)), resScale));
+                            }
+                            if (Keyboard.GetState().IsKeyUp(Keys.K) && enterKeyWasPressed == true)
+                            {
+                                enterKeyWasPressed = false;
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.P))
+                            {
+                                ClearScenery();
+                                SpawnScenery();
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.L))
+                            {
+                                ForceEncounter(gameTime);
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
+                            {
+                                ikeypressed = true;
+                                if (!showBoundaries)
+                                {
+                                    showBoundaries = true;
+                                } else
+                                {
+                                    showBoundaries = false;
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyUp(Keys.I) && ikeypressed == true)
+                            {
+                                ikeypressed = false;
+                            }
                         }
                     }
                     if (inCombat)
@@ -932,6 +957,14 @@ namespace TheGame
                 {
                     mapPos = lastKnownPos;
                     isMapMoving = false;
+                }
+                for (int i = 0; i < mapBoundaries.Count; i++)
+                {
+                    if (redguyMapRect.Intersects(mapBoundaries[i]))
+                    {
+                        mapPos = lastKnownPos;
+                        isMapMoving = false;
+                    }
                 }
                 lastKnownPos = mapPos;
                 mapPos.X += movementX * ((float)mapSpeed * resScale);
@@ -1491,6 +1524,7 @@ namespace TheGame
 
         void ClearScenery()
         {
+            mapBoundaries.Clear();
             mountains.Clear();
         }
 
@@ -1500,6 +1534,8 @@ namespace TheGame
             smileyCheiftain.Clear();
             statues.Clear();
             bullets.Clear();
+            yetis.Clear();
+            frogs.Clear();
         }
 
         protected override void Draw(GameTime gameTime)
@@ -1532,6 +1568,17 @@ namespace TheGame
             {
                 if (inWorldMap)
                 {
+                    // MAP BOUNDARIES
+                    mapBoundaries.Add(new Rectangle(120 * resScale, 50 * resScale, 45 * resScale, 200 * resScale));
+                    mapBoundaries.Add(new Rectangle(145 * resScale, 240 * resScale, 40 * resScale, 200 * resScale));
+                    mapBoundaries.Add(new Rectangle(135 * resScale, 430 * resScale, 490 * resScale, 40 * resScale));
+                    mapBoundaries.Add(new Rectangle(620 * resScale, 290 * resScale, 40 * resScale, 200 * resScale));
+                    mapBoundaries.Add(new Rectangle(645 * resScale, 100 * resScale, 40 * resScale, 190 * resScale));
+                    mapBoundaries.Add(new Rectangle(600 * resScale, 0 * resScale, 50 * resScale, 115 * resScale));
+                    mapBoundaries.Add(new Rectangle(305 * resScale, 0 * resScale, 295 * resScale, 10 * resScale));
+                    mapBoundaries.Add(new Rectangle(165 * resScale, 0 * resScale, 145 * resScale, 35 * resScale));
+                    mapBoundaries.Add(new Rectangle(165 * resScale, 0 * resScale, 110 * resScale, 60 * resScale));
+
                     Rectangle mapRect = new Rectangle(0 * resScale, 0 * resScale, mapSprite.Width / 2 * resScale, mapSprite.Height / 2 * resScale);
                     if (inSingleplayer)
                     {
@@ -1543,6 +1590,13 @@ namespace TheGame
                     }
                     // Map sprite here
                     _spriteBatch.Draw(mapSprite, mapRect, Color.White);
+                    if (showBoundaries)
+                    {
+                        for (int i = 0; i < mapBoundaries.Count; i++)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, mapBoundaries[i], Color.Red);
+                        }
+                    }
                     // Mountains (first layer)
                     for (int i = 0; i < 8; i++)
                     {

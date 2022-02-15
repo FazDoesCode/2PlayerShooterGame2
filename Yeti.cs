@@ -80,7 +80,7 @@ namespace TheGame
                     randomNumber = new Random().Next(1, 6);
                 }
 
-                if (randomNumber == 6 && canAttack || gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAttacked + 5000)
+                if (randomNumber == 6 && canAttack || gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastAttacked + 3500)
                 {
                     Attack(gameTime);
                 }
