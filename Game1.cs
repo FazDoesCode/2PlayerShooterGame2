@@ -48,6 +48,7 @@ namespace TheGame
         Texture2D singleplayerButton;
         Texture2D exitButton;
         Texture2D settingsButton;
+        Texture2D tutorialButton;
 
         //Declaring Players
         Texture2D coopMapSprite;
@@ -115,6 +116,7 @@ namespace TheGame
         Vector2 mapPos;
         Vector2 targetPos;
         bool isMapMoving = false;
+        bool canMapMove = true;
         double mapSpeed = 0.85;
 
         float distanceToTravelX;
@@ -137,7 +139,14 @@ namespace TheGame
         bool canCombatMove = true;
         bool wonCurrentEncounter = false;
 
-        double timeSinceLastSnow;
+        double timeSinceLastSnow = 0;
+
+        int flashAlpha = 0;
+        bool encounterFlashing;
+        bool flashDarken = true;
+        bool flashLighten = false;
+        double flashLastIncrement;
+        double encounterStartTime;
 
         // Store stuff
         bool inStore = false;
@@ -228,11 +237,14 @@ namespace TheGame
         public Rectangle blueguyRect;
         public Rectangle blueguyBody;
         public Rectangle blueguyHead;
+
         public Rectangle mouseRect;
         public Rectangle singleplayerButtonRect;
         public Rectangle coopButtonRect;
         public Rectangle settingsButtonRect;
         public Rectangle exitButtonRect;
+        public Rectangle tutorialButtonRect;
+        
         public Rectangle gateRect;
         public Rectangle storeRect;
 
@@ -365,6 +377,7 @@ namespace TheGame
             exitButton = Content.Load<Texture2D>("Items/exitbutton");
             singleplayerButton = Content.Load<Texture2D>("Items/singleplayerbutton");
             settingsButton = Content.Load<Texture2D>("Items/settingsbutton");
+            tutorialButton = Content.Load<Texture2D>("Items/tutorialbutton");
 
             //Players
             coopMapSprite = Content.Load<Texture2D>("Players/CoopGuys");
@@ -394,18 +407,20 @@ namespace TheGame
             frogAttackingSprite = Content.Load<Texture2D>("Enemies/frogattack");
             frogTongueSprite = Content.Load<Texture2D>("Enemies/frogtongue");
 
-            //Misc
+            //Scenery
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
-            cloudSprite = Content.Load<Texture2D>("Scenery/cloud");
             gateSprite = Content.Load<Texture2D>("Scenery/gate");
+            cloudSprite = Content.Load<Texture2D>("Scenery/cloud");
+            storeSprite = Content.Load<Texture2D>("Scenery/store");
+            treeSprite = Content.Load<Texture2D>("Scenery/Tree");
+            snowflakeSprite = Content.Load<Texture2D>("Scenery/snowflake");
+
+            //Misc
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
             whiteSquareSprite = Content.Load<Texture2D>("Items/whitesquare");
-            storeSprite = Content.Load<Texture2D>("Scenery/store");
             coinSprite = Content.Load<Texture2D>("Items/coin");
             shopkeeperSprite = Content.Load<Texture2D>("Scenery/DSL");
             debugIndicator = Content.Load<Texture2D>("Backgrounds/debug");
-            treeSprite = Content.Load<Texture2D>("Scenery/Tree");
-            snowflakeSprite = Content.Load<Texture2D>("Scenery/snowflake");
         }
 
         protected override void Update(GameTime gameTime)
@@ -424,9 +439,12 @@ namespace TheGame
                 bullets[i].MoveBullet();
             }
 
-            if (mouseState.RightButton == ButtonState.Pressed)
+            if (debugmode)
             {
-                Debug.WriteLine(mouseState.X + "," + mouseState.Y);
+                if (mouseState.RightButton == ButtonState.Pressed)
+                {
+                    Debug.WriteLine(mouseState.X + "," + mouseState.Y);
+                }
             }
             if (Keyboard.GetState().IsKeyDown(Keys.F4) && !gameHasStarted)
             {
@@ -509,6 +527,11 @@ namespace TheGame
                     redguyHealth = 3;
                     blueguyHealth = 3;
                 }
+                else if (tutorialButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
+                {
+                    isClicking = true;
+                    Debug.WriteLine("tutorial");
+                }
                 else if (settingsButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
@@ -525,20 +548,21 @@ namespace TheGame
             }
             if (gameHasStarted)
             {
-                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && escapeKeyWasPressed == false && !inCombat && !inStore)
+                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && escapeKeyWasPressed == false && !inCombat && !inStore && !encounterFlashing)
                 {
                     escapeKeyWasPressed = true;
                     BackToMenu();
                 }
-                else if (Keyboard.GetState().IsKeyUp(Keys.Escape) && escapeKeyWasPressed == true && !inCombat && !inStore)
+                else if (Keyboard.GetState().IsKeyUp(Keys.Escape) && escapeKeyWasPressed == true && !inCombat && !inStore && !encounterFlashing)
                 {
                     escapeKeyWasPressed = false;
                 }
-                if (isInSnow)
+                if (isInSnow && !wonCurrentEncounter)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSnow + 25)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSnow + 10)
                     {
                         snow.Add(new Snowflake(snowflakeSprite, RandomSnowPos(), resScale));
+                        timeSinceLastSnow = gameTime.TotalGameTime.TotalMilliseconds;
                     }
                 }
                 for (int i = 0; i < snow.Count; i++)
@@ -548,6 +572,15 @@ namespace TheGame
                     {
                         snow.RemoveAt(i);
                     }
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && encounterFlashing)
+                {
+                    encounterStartTime -= 1650;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.Escape) && wonCurrentEncounter)
+                {
+                    timeSinceLastWon -= 7000;
+                    escapeKeyWasPressed = true;
                 }
                 if (inSingleplayer)
                 {
@@ -594,13 +627,14 @@ namespace TheGame
                             inWorldMap = false;
                             inStore = true;
                         }
+
                         if (debugmode)
                         {
                             if (Keyboard.GetState().IsKeyDown(Keys.K))
                             {
                                 mountains.Add(new Mountain(mountainSprite, new Vector2((int)(mousePos.X), (int)(mousePos.Y)), resScale));
                             }
-                            if (Keyboard.GetState().IsKeyDown(Keys.L))
+                            if (Keyboard.GetState().IsKeyDown(Keys.O))
                             {
                                 trees.Add(new Tree(treeSprite, new Vector2((int)(mousePos.X), (int)(mousePos.Y)), resScale));
                             }
@@ -996,55 +1030,58 @@ namespace TheGame
         }
         void SPPlayerMapMove(GameTime gameTime)
         {
-            MouseState mouseState = Mouse.GetState();
-            mousePos = new Point(mouseState.X, mouseState.Y);
-
-            if (!isClicking)
+            if (canMapMove)
             {
-                if (mouseState.LeftButton == ButtonState.Pressed)
-                {
-                    targetPos.X = mousePos.X - 7 * resScale;
-                    targetPos.Y = mousePos.Y - 13 * resScale;
+                MouseState mouseState = Mouse.GetState();
+                mousePos = new Point(mouseState.X, mouseState.Y);
 
-                    isMapMoving = true;
+                if (!isClicking)
+                {
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        targetPos.X = mousePos.X - 7 * resScale;
+                        targetPos.Y = mousePos.Y - 13 * resScale;
+
+                        isMapMoving = true;
+                    }
                 }
-            }
-            
-            if (isMapMoving)
-            {
-                distanceToTravelX = targetPos.X - mapPos.X;
-                distanceToTravelY = targetPos.Y - mapPos.Y;
-                distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
-                movementX = distanceToTravelX / distanceToTravelTotal;
-                movementY = distanceToTravelY / distanceToTravelTotal;
 
-                for (int i = 0; i < mountains.Count; i++)
+                if (isMapMoving)
                 {
-                    if (redguyMapRect.Intersects(mountains[i].mountainRect))
+                    distanceToTravelX = targetPos.X - mapPos.X;
+                    distanceToTravelY = targetPos.Y - mapPos.Y;
+                    distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
+                    movementX = distanceToTravelX / distanceToTravelTotal;
+                    movementY = distanceToTravelY / distanceToTravelTotal;
+
+                    for (int i = 0; i < mountains.Count; i++)
+                    {
+                        if (redguyMapRect.Intersects(mountains[i].mountainRect))
+                        {
+                            mapPos = lastKnownPos;
+                            isMapMoving = false;
+                        }
+                    }
+                    if (redguyMapRect.Intersects(gateRect))
                     {
                         mapPos = lastKnownPos;
                         isMapMoving = false;
                     }
-                }
-                if (redguyMapRect.Intersects(gateRect))
-                {
-                    mapPos = lastKnownPos;
-                    isMapMoving = false;
-                }
-                for (int i = 0; i < mapBoundaries.Count; i++)
-                {
-                    if (redguyMapRect.Intersects(mapBoundaries[i]))
+                    for (int i = 0; i < mapBoundaries.Count; i++)
                     {
-                        mapPos = lastKnownPos;
+                        if (redguyMapRect.Intersects(mapBoundaries[i]))
+                        {
+                            mapPos = lastKnownPos;
+                            isMapMoving = false;
+                        }
+                    }
+                    lastKnownPos = mapPos;
+                    mapPos.X += movementX * ((float)mapSpeed * resScale);
+                    mapPos.Y += movementY * ((float)mapSpeed * resScale);
+                    if (distanceToTravelTotal < 1 * resScale)
+                    {
                         isMapMoving = false;
                     }
-                }
-                lastKnownPos = mapPos;
-                mapPos.X += movementX * ((float)mapSpeed * resScale);
-                mapPos.Y += movementY * ((float)mapSpeed * resScale);
-                if (distanceToTravelTotal < 1 * resScale)
-                {
-                    isMapMoving = false;
                 }
             }
         }
@@ -1155,7 +1192,7 @@ namespace TheGame
             {
                 if (isInPlains)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 2500)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 3000)
                     {
                         if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
                         {
@@ -1173,7 +1210,7 @@ namespace TheGame
                     }
                 } else if (isInSnow)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 2500)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 3000)
                     {
                         if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
                         {
@@ -1191,7 +1228,7 @@ namespace TheGame
                     }
                 } else if (isInSwamp)
                 {
-                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 2500)
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 3000)
                     {
                         if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
                         {
@@ -1218,16 +1255,19 @@ namespace TheGame
         {
             ClearEnemies();
             isMapMoving = false;
+            canMapMove = false;
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
-            inWorldMap = false;
-            inCombat = true;
+            encounterStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+            encounterFlashing = true;
             int etf = new Random().Next(1, 101);
             if (etf <= 70)
             {
                 enemyToFight = 1;
-            } else if (etf >= 71) {
+            }
+            else if (etf >= 71)
+            {
                 enemyToFight = 2;
             }
             if (enemyToFight == 1)
@@ -1239,7 +1279,8 @@ namespace TheGame
                 if (extraSmiley == 1)
                 {
                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(500 * resScale, 420 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier, 4));
-                } else if (extraSmiley == 2)
+                }
+                else if (extraSmiley == 2)
                 {
                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(500 * resScale, 420 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier, 4));
                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(510 * resScale, 310 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier, 4));
@@ -1248,7 +1289,8 @@ namespace TheGame
                 {
                     smileys[i].moveStart = gameTime.TotalGameTime.TotalMilliseconds;
                 }
-            } else if (enemyToFight == 2)
+            }
+            else if (enemyToFight == 2)
             {
                 smileyCheiftain.Add(new SmileyChieftain(smileyChieftanSprite, new Vector2(600 * resScale, 240 * resScale), resScale, 25 * healthMultiplier));
                 smileys.Add(new Smiley(smileyEnemySprite, new Vector2(500 * resScale, 420 * resScale), new Vector2(550 * resScale, 290 * resScale), resScale, 5 * healthMultiplier, 4));
@@ -1264,7 +1306,7 @@ namespace TheGame
                 }
                 for (int i = 0; i < smileyCheiftain.Count; i++)
                 {
-                     smileyCheiftain[i].moveStart = gameTime.TotalGameTime.TotalMilliseconds;
+                    smileyCheiftain[i].moveStart = gameTime.TotalGameTime.TotalMilliseconds;
                 }
                 timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
             }
@@ -1274,11 +1316,12 @@ namespace TheGame
         {
             ClearEnemies();
             isMapMoving = false;
+            canMapMove = false;
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
-            inWorldMap = false;
-            inCombat = true;
+            encounterStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+            encounterFlashing = true;
             int etf = new Random().Next(1, 101);
             if (etf <= 60)
             {
@@ -1302,11 +1345,12 @@ namespace TheGame
         {
             ClearEnemies();
             isMapMoving = false;
+            canMapMove = false;
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
-            inWorldMap = false;
-            inCombat = true;
+            encounterStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+            encounterFlashing = true;
             int etf = new Random().Next(1, 101);
             enemyToFight = 5;
             if (enemyToFight == 5)
@@ -1321,6 +1365,7 @@ namespace TheGame
         {
             wonCurrentEncounter = false;
             canCombatMove = true;
+            canMapMove = true;
             addedCoin = false;
             timeSinceLastEncounter = gameTime.TotalGameTime.TotalMilliseconds;
             enemyToFight = 0;
@@ -1606,6 +1651,8 @@ namespace TheGame
             trees.Add(new Tree(treeSprite, new Vector2(440 * resScale, 225 * resScale), resScale));
             trees.Add(new Tree(treeSprite, new Vector2(550 * resScale, 90 * resScale), resScale));
             trees.Add(new Tree(treeSprite, new Vector2(450 * resScale, 125 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(600 * resScale, 205 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(445 * resScale, 20 * resScale), resScale));
         }
 
         void ClearScenery()
@@ -1636,10 +1683,11 @@ namespace TheGame
 
             mouseRect = new Rectangle(mousePos.X, mousePos.Y, 1, 1);
             Rectangle mainmenuRect = new Rectangle(0, 0, mainMenuSprite.Width * resScale, mainMenuSprite.Height * resScale);
-            singleplayerButtonRect = new Rectangle(290 * resScale, 200 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
-            coopButtonRect = new Rectangle(290 * resScale, 280 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            singleplayerButtonRect = new Rectangle(290 * resScale, 180 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            coopButtonRect = new Rectangle(290 * resScale, 260 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
             settingsButtonRect = new Rectangle(5 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
             exitButtonRect = new Rectangle(595 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
+            tutorialButtonRect = new Rectangle(290 * resScale, 340 * resScale, oneButton.Width, oneButton.Height);
 
             //Main Menu Drawing
             if (isInMainMenu)
@@ -1653,6 +1701,7 @@ namespace TheGame
                 _spriteBatch.Draw(coopButton, coopButtonRect, Color.White);
                 _spriteBatch.Draw(settingsButton, settingsButtonRect, Color.White);
                 _spriteBatch.Draw(exitButton, exitButtonRect, Color.White);
+                _spriteBatch.Draw(tutorialButton, tutorialButtonRect, Color.White);
                 _spriteBatch.Draw(oneButton, mouseRect, Color.Transparent);
             }
             if (gameHasStarted)
@@ -1760,7 +1809,6 @@ namespace TheGame
                     {
                         _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
                     }
-                    
                 }
                 if (inCombat)
                 {
@@ -1842,18 +1890,6 @@ namespace TheGame
                         }
                     }
 
-                    if (wonCurrentEncounter)
-                    {
-                        if (gameTime.TotalGameTime.TotalMilliseconds < timeSinceLastWon + 2000)
-                        {
-                            _spriteBatch.Draw(youWonText, new Rectangle(0, 0, youWonText.Width * resScale, youWonText.Height * resScale), Color.White);
-                        }
-                        if (addedCoin && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && gameTime.TotalGameTime.TotalMilliseconds < timeSinceLastWon + 5000)
-                        {
-                            _spriteBatch.Draw(encounterBonusText, new Rectangle(0, 0, encounterBonusText.Width * resScale, encounterBonusText.Height * resScale), Color.White);
-                        }
-                    }
-
                     // Enemies
                     for (int i = 0; i < smileyCheiftain.Count; i++)
                     {
@@ -1910,12 +1946,60 @@ namespace TheGame
                     {
                         bullets[i].Draw(_spriteBatch);
                     }
+                // Snow drawing
                 }
-                if (!wonCurrentEncounter)
+                for (int i = 0; i < snow.Count; i++)
                 {
-                    for (int i = 0; i < snow.Count; i++)
+                    snow[i].Draw(_spriteBatch);
+                }
+                // Encounter Flash drawing
+                if (encounterFlashing)
+                {
+                    if (flashDarken)
                     {
-                        snow[i].Draw(_spriteBatch);
+                        if (flashAlpha <= 250 && gameTime.TotalGameTime.TotalMilliseconds > flashLastIncrement + 1)
+                        {
+                            flashAlpha += 10;
+                            flashLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                        _spriteBatch.Draw(bulletSprite, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), new Color(Color.White, flashAlpha));
+                        if (flashAlpha >= 250)
+                        {
+                            flashDarken = false;
+                            flashLighten = true;
+                        }
+                    }
+                    if (flashLighten)
+                    {
+                        if (flashAlpha >= 0 && gameTime.TotalGameTime.TotalMilliseconds > flashLastIncrement + 1)
+                        {
+                            flashAlpha -= 10;
+                            flashLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                        _spriteBatch.Draw(bulletSprite, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), new Color(Color.White, flashAlpha));
+                        if (flashAlpha <= 0)
+                        {
+                            flashLighten = false;
+                            flashDarken = true;
+                        }
+                    }
+                }
+                if (encounterFlashing && gameTime.TotalGameTime.TotalMilliseconds > encounterStartTime + 1650)
+                {
+                    encounterFlashing = false;
+                    inWorldMap = false;
+                    inCombat = true;
+                }
+                // Win screen drawing
+                if (wonCurrentEncounter)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds < timeSinceLastWon + 2000)
+                    {
+                        _spriteBatch.Draw(youWonText, new Rectangle(0, 0, youWonText.Width * resScale, youWonText.Height * resScale), Color.White);
+                    }
+                    if (addedCoin && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && gameTime.TotalGameTime.TotalMilliseconds < timeSinceLastWon + 5000)
+                    {
+                        _spriteBatch.Draw(encounterBonusText, new Rectangle(0, 0, encounterBonusText.Width * resScale, encounterBonusText.Height * resScale), Color.White);
                     }
                 }
                 if (inStore)
