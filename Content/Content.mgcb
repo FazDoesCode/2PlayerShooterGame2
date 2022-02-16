@@ -25,18 +25,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Controlsscreen.png
 
-#begin Backgrounds/Controlsscreen.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/Controlsscreen.png
-
 #begin Backgrounds/debug.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,18 +49,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/desertbackground.png
 
-#begin Backgrounds/desertbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/desertbackground.png
-
 #begin Backgrounds/EncounterBonusText.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -84,30 +60,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Backgrounds/EncounterBonusText.png
-
-#begin Backgrounds/EncounterBonusText.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/EncounterBonusText.png
-
-#begin Backgrounds/mainmenu.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/mainmenu.png
 
 #begin Backgrounds/mainmenu.png
 /importer:TextureImporter
@@ -133,18 +85,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/map.png
 
-#begin Backgrounds/map.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/map.png
-
 #begin Backgrounds/narb.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -156,30 +96,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Backgrounds/narb.png
-
-#begin Backgrounds/narb.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/narb.png
-
-#begin Backgrounds/plainsbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/plainsbackground.png
 
 #begin Backgrounds/plainsbackground.png
 /importer:TextureImporter
@@ -205,30 +121,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/shopbackground.png
 
-#begin Backgrounds/shopbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/shopbackground.png
-
-#begin Backgrounds/shopcounter.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/shopcounter.png
-
 #begin Backgrounds/shopcounter.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -253,18 +145,6 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/snowbackground.png
 
-#begin Backgrounds/snowbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/snowbackground.png
-
 #begin Backgrounds/swampbackground.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -276,30 +156,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Backgrounds/swampbackground.png
-
-#begin Backgrounds/swampbackground.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/swampbackground.png
-
-#begin Backgrounds/YouWonText.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Backgrounds/YouWonText.png
 
 #begin Backgrounds/YouWonText.png
 /importer:TextureImporter
@@ -783,18 +639,6 @@
 /processorParam:TextureFormat=Color
 /build:Scenery/cloud.png
 
-#begin Scenery/cloud.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Scenery/cloud.png
-
 #begin Scenery/DSL.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -806,30 +650,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Scenery/DSL.png
-
-#begin Scenery/DSL.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Scenery/DSL.png
-
-#begin Scenery/gate.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Scenery/gate.png
 
 #begin Scenery/gate.png
 /importer:TextureImporter
@@ -855,7 +675,7 @@
 /processorParam:TextureFormat=Color
 /build:Scenery/Mountain.png
 
-#begin Scenery/Mountain.png
+#begin Scenery/snowflake.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -865,19 +685,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Scenery/Mountain.png
-
-#begin Scenery/store.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Scenery/store.png
+/build:Scenery/snowflake.png
 
 #begin Scenery/store.png
 /importer:TextureImporter
@@ -909,29 +717,11 @@
 /processorParam:Quality=Best
 /build:sound effects/bang.mp3
 
-#begin sound effects/bang.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:sound effects/bang.mp3
-
 #begin sound effects/Boom.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/Boom.mp3
-
-#begin sound effects/Boom.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:sound effects/Boom.mp3
-
-#begin sound effects/deathsound.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:sound effects/deathsound.mp3
 
 #begin sound effects/deathsound.mp3
 /importer:Mp3Importer
@@ -951,29 +741,11 @@
 /processorParam:Quality=Best
 /build:sound effects/pew.mp3
 
-#begin sound effects/pew.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:sound effects/pew.mp3
-
 #begin sound effects/walksound.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:sound effects/walksound.mp3
-
-#begin sound effects/walksound.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:sound effects/walksound.mp3
-
-#begin sound effects/woosh.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:sound effects/woosh.mp3
 
 #begin sound effects/woosh.mp3
 /importer:Mp3Importer

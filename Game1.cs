@@ -87,6 +87,8 @@ namespace TheGame
         Texture2D coinSprite;
         Texture2D shopkeeperSprite;
         Texture2D debugIndicator;
+        Texture2D treeSprite;
+        Texture2D snowflakeSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -98,6 +100,8 @@ namespace TheGame
         List<Yeti> yetis = new List<Yeti>();
         List<Frog> frogs = new List<Frog>();
         List<Rectangle> mapBoundaries = new List<Rectangle>();
+        List<Tree> trees = new List<Tree>();
+        List<Snowflake> snow = new List<Snowflake>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -132,6 +136,8 @@ namespace TheGame
         bool addedCoin;
         bool canCombatMove = true;
         bool wonCurrentEncounter = false;
+
+        double timeSinceLastSnow;
 
         // Store stuff
         bool inStore = false;
@@ -398,6 +404,8 @@ namespace TheGame
             coinSprite = Content.Load<Texture2D>("Items/coin");
             shopkeeperSprite = Content.Load<Texture2D>("Scenery/DSL");
             debugIndicator = Content.Load<Texture2D>("Backgrounds/debug");
+            treeSprite = Content.Load<Texture2D>("Scenery/Tree");
+            snowflakeSprite = Content.Load<Texture2D>("Scenery/snowflake");
         }
 
         protected override void Update(GameTime gameTime)
@@ -526,6 +534,21 @@ namespace TheGame
                 {
                     escapeKeyWasPressed = false;
                 }
+                if (isInSnow)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSnow + 25)
+                    {
+                        snow.Add(new Snowflake(snowflakeSprite, RandomSnowPos(), resScale));
+                    }
+                }
+                for (int i = 0; i < snow.Count; i++)
+                {
+                    snow[i].Snowfall(gameTime);
+                    if (snow[i].position.X < 0 - snow[i].texture.Width)
+                    {
+                        snow.RemoveAt(i);
+                    }
+                }
                 if (inSingleplayer)
                 {
                     if (inWorldMap)
@@ -573,14 +596,13 @@ namespace TheGame
                         }
                         if (debugmode)
                         {
-                            if (Keyboard.GetState().IsKeyDown(Keys.K) && enterKeyWasPressed == false)
+                            if (Keyboard.GetState().IsKeyDown(Keys.K))
                             {
-                                enterKeyWasPressed = true;
-                                mountains.Add(new Mountain(mountainSprite, new Vector2((int)(mousePos.X - 25 * resScale), (int)(mousePos.Y - 25 * resScale)), resScale));
+                                mountains.Add(new Mountain(mountainSprite, new Vector2((int)(mousePos.X), (int)(mousePos.Y)), resScale));
                             }
-                            if (Keyboard.GetState().IsKeyUp(Keys.K) && enterKeyWasPressed == true)
+                            if (Keyboard.GetState().IsKeyDown(Keys.L))
                             {
-                                enterKeyWasPressed = false;
+                                trees.Add(new Tree(treeSprite, new Vector2((int)(mousePos.X), (int)(mousePos.Y)), resScale));
                             }
                             if (Keyboard.GetState().IsKeyDown(Keys.P))
                             {
@@ -966,7 +988,12 @@ namespace TheGame
             }
             base.Update(gameTime);
         }
-
+        private Vector2 RandomSnowPos()
+        {
+            int maxX = new Random().Next(0, _graphics.PreferredBackBufferWidth + 400 * resScale);
+            int maxY = new Random().Next(0, _graphics.PreferredBackBufferHeight - 475 * resScale);
+            return new Vector2(maxX, maxY);
+        }
         void SPPlayerMapMove(GameTime gameTime)
         {
             MouseState mouseState = Mouse.GetState();
@@ -1470,6 +1497,7 @@ namespace TheGame
                 mapPos = new Vector2(390 * resScale, 225 * resScale);
                 lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
             }
+            // ^^ GAME OVER FUNCTION PLS
             int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
             {
@@ -1531,7 +1559,7 @@ namespace TheGame
                     Window.Title = "sample text";
                     break;
             }
-            int randomchancexd = new Random().Next(1, 501);
+            int randomchancexd = new Random().Next(1, 251);
             if (randomchancexd == 1)
             {
                 narb = true;
@@ -1548,7 +1576,7 @@ namespace TheGame
             ClearEnemies();
         }
 
-        // That scenery....
+        // That scenery.
         void SpawnScenery()
         {
             // Mountains
@@ -1573,12 +1601,18 @@ namespace TheGame
             mountains.Add(new Mountain(mountainSprite, new Vector2((int)(493 * resScale), (int)(300 * resScale)), resScale));
             mountains.Add(new Mountain(mountainSprite, new Vector2((int)(418 * resScale), (int)(296 * resScale)), resScale));
             mountains.Add(new Mountain(mountainSprite, new Vector2((int)(443 * resScale), (int)(304 * resScale)), resScale));
+
+            // Trees
+            trees.Add(new Tree(treeSprite, new Vector2(440 * resScale, 225 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(550 * resScale, 90 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(450 * resScale, 125 * resScale), resScale));
         }
 
         void ClearScenery()
         {
             mapBoundaries.Clear();
             mountains.Clear();
+            trees.Clear();
         }
 
         void ClearEnemies()
@@ -1674,6 +1708,10 @@ namespace TheGame
                     storeRect = new Rectangle(550 * resScale, 165 * resScale, storeSprite.Width * resScale, storeSprite.Height * resScale);
                     _spriteBatch.Draw(whiteSquareSprite, new Rectangle(545 * resScale, 215 * resScale, (storeSprite.Width + 10) * resScale, 13 * resScale), new Color(Color.Black, 100));
                     _spriteBatch.Draw(storeSprite, storeRect, Color.White);
+                    for (int i = 0; i < trees.Count; i++)
+                    {
+                        trees[i].Draw(_spriteBatch);
+                    }
                     if (inSingleplayer)
                     {
                         if (mousePos.X < mapPos.X + 7 * resScale)
@@ -1688,6 +1726,13 @@ namespace TheGame
                         {
                             _spriteBatch.Draw(storeSprite, storeRect, Color.White);
                         }
+                        for (int i = 0; i < trees.Count; i++)
+                        {
+                            if (mapPos.Y < trees[i].position.Y + 22 * resScale)
+                            {
+                                trees[i].Draw(_spriteBatch);
+                            }
+                        }
                     }
                     if (inCoop)
                     {
@@ -1699,11 +1744,23 @@ namespace TheGame
                         {
                             _spriteBatch.Draw(coopMapSprite, coopMapRect, Color.White);
                         }
+                        if (mapPos.Y < storeRect.Y + 30 * resScale)
+                        {
+                            _spriteBatch.Draw(storeSprite, storeRect, Color.White);
+                        }
+                        for (int i = 0; i < trees.Count; i++)
+                        {
+                            if (mapPos.Y < trees[i].position.Y + 22 * resScale)
+                            {
+                                trees[i].Draw(_spriteBatch);
+                            }
+                        }
                     }
                     for (int i = 0; i < coinSprites.Count; i++)
                     {
                         _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
                     }
+                    
                 }
                 if (inCombat)
                 {
@@ -1852,6 +1909,13 @@ namespace TheGame
                     for (int i = 0; i < bullets.Count; i++)
                     {
                         bullets[i].Draw(_spriteBatch);
+                    }
+                }
+                if (!wonCurrentEncounter)
+                {
+                    for (int i = 0; i < snow.Count; i++)
+                    {
+                        snow[i].Draw(_spriteBatch);
                     }
                 }
                 if (inStore)
