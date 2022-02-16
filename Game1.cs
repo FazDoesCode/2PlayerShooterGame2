@@ -142,11 +142,11 @@ namespace TheGame
         double timeSinceLastSnow = 0;
 
         int flashAlpha = 0;
+        int timesFlashed;
         bool encounterFlashing;
         bool flashDarken = true;
         bool flashLighten = false;
         double flashLastIncrement;
-        double encounterStartTime;
 
         // Store stuff
         bool inStore = false;
@@ -575,7 +575,7 @@ namespace TheGame
                 }
                 if (Keyboard.GetState().IsKeyDown(Keys.Escape) && encounterFlashing)
                 {
-                    encounterStartTime -= 1650;
+                    timesFlashed = 7;
                 }
                 if (Keyboard.GetState().IsKeyDown(Keys.Escape) && wonCurrentEncounter)
                 {
@@ -1259,14 +1259,14 @@ namespace TheGame
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
-            encounterStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+            timesFlashed = 0;
             encounterFlashing = true;
             int etf = new Random().Next(1, 101);
-            if (etf <= 70)
+            if (etf <= 65)
             {
                 enemyToFight = 1;
             }
-            else if (etf >= 71)
+            else if (etf >= 66)
             {
                 enemyToFight = 2;
             }
@@ -1320,7 +1320,7 @@ namespace TheGame
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
-            encounterStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+            timesFlashed = 0;
             encounterFlashing = true;
             int etf = new Random().Next(1, 101);
             if (etf <= 60)
@@ -1349,15 +1349,20 @@ namespace TheGame
             redguyPos = new Vector2(162 * resScale, 258 * resScale);
             blueguyPos = new Vector2(60 * resScale, 330 * resScale);
             lastKnownPos = mapPos;
-            encounterStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+            timesFlashed = 0;
             encounterFlashing = true;
             int etf = new Random().Next(1, 101);
             enemyToFight = 5;
             if (enemyToFight == 5)
             {
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 8 * healthMultiplier));
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(600 * resScale, 300 * resScale), resScale, 8 * healthMultiplier));
-                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(400 * resScale, 400 * resScale), resScale, 8 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 7 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(600 * resScale, 300 * resScale), resScale, 7 * healthMultiplier));
+                frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(400 * resScale, 400 * resScale), resScale, 7 * healthMultiplier));
+                int randomnumb = new Random().Next(1, 11);
+                if (randomnumb <= 1)
+                {
+                    frogs.Add(new Frog(this, frogSprite, frogAttackingSprite, frogTongueSprite, new Vector2(600 * resScale, 400 * resScale), resScale, 7 * healthMultiplier));
+                }
             }
         }
 
@@ -1387,74 +1392,73 @@ namespace TheGame
             // 3 = statue
             // 4 = yeti
             // 5 = frog
-            if (enemyToFight == 1)
+            switch (enemyToFight)
             {
-                if (!hasFought1)
-                {
-                    hasFought1 = true;
-                    if (playerCoins > 0)
+                case 1:
+                    if (!hasFought1)
                     {
-                        coinDistance += 20;
+                        hasFought1 = true;
+                        if (playerCoins > 0)
+                        {
+                            coinDistance += 20;
+                        }
+                        playerCoins++;
+                        coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                        addedCoin = true;
                     }
-                    playerCoins++;
-                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-                    addedCoin = true;
-                }
-            } else if (enemyToFight == 2)
-            {
-                if (!hasFought2)
-                {
-                    hasFought2 = true;
-                    if (playerCoins > 0)
+                    break;
+                case 2:
+                    if (!hasFought2)
                     {
-                        coinDistance += 20;
+                        hasFought2 = true;
+                        if (playerCoins > 0)
+                        {
+                            coinDistance += 20;
+                        }
+                        playerCoins++;
+                        coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                        addedCoin = true;
                     }
-                    playerCoins++;
-                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-                    addedCoin = true;
-                }
-            }
-            else if (enemyToFight == 3)
-            {
-                if (!hasFought3)
-                {
-                    hasFought3 = true;
-                    if (playerCoins > 0)
+                    break;
+                case 3:
+                    if (!hasFought3)
                     {
-                        coinDistance += 20;
+                        hasFought3 = true;
+                        if (playerCoins > 0)
+                        {
+                            coinDistance += 20;
+                        }
+                        playerCoins++;
+                        coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                        addedCoin = true;
                     }
-                    playerCoins++;
-                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-                    addedCoin = true;
-                }
-            }
-            else if (enemyToFight == 4)
-            {
-                if (!hasFought4)
-                {
-                    hasFought4 = true;
-                    if (playerCoins > 0)
+                    break;
+                case 4:
+                    if (!hasFought4)
                     {
-                        coinDistance += 20;
+                        hasFought4 = true;
+                        if (playerCoins > 0)
+                        {
+                            coinDistance += 20;
+                        }
+                        playerCoins++;
+                        coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                        addedCoin = true;
                     }
-                    playerCoins++;
-                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-                    addedCoin = true;
-                }
-            }
-            else if (enemyToFight == 5)
-            {
-                if (!hasFought5)
-                {
-                    hasFought5 = true;
-                    if (playerCoins > 0)
+                    break;
+                case 5:
+                    if (!hasFought5)
                     {
-                        coinDistance += 20;
+                        hasFought5 = true;
+                        if (playerCoins > 0)
+                        {
+                            coinDistance += 20;
+                        }
+                        playerCoins++;
+                        coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
+                        addedCoin = true;
                     }
-                    playerCoins++;
-                    coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-                    addedCoin = true;
-                }
+                    break;
             }
         }
 
@@ -1965,6 +1969,7 @@ namespace TheGame
                         _spriteBatch.Draw(bulletSprite, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), new Color(Color.White, flashAlpha));
                         if (flashAlpha >= 250)
                         {
+                            timesFlashed++;
                             flashDarken = false;
                             flashLighten = true;
                         }
@@ -1979,16 +1984,18 @@ namespace TheGame
                         _spriteBatch.Draw(bulletSprite, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), new Color(Color.White, flashAlpha));
                         if (flashAlpha <= 0)
                         {
+                            timesFlashed++;
                             flashLighten = false;
                             flashDarken = true;
                         }
                     }
                 }
-                if (encounterFlashing && gameTime.TotalGameTime.TotalMilliseconds > encounterStartTime + 1650)
+                if (encounterFlashing && timesFlashed >= 6)
                 {
                     encounterFlashing = false;
                     inWorldMap = false;
                     inCombat = true;
+                    timesFlashed = 0;
                 }
                 // Win screen drawing
                 if (wonCurrentEncounter)
