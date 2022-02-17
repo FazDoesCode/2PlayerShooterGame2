@@ -496,6 +496,7 @@ namespace TheGame
 
             if (isInMainMenu == true)
             {
+                IsMouseVisible = true;
                 if (singleplayerButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
                     isClicking = true;
@@ -586,6 +587,10 @@ namespace TheGame
                 {
                     if (inWorldMap)
                     {
+                        if (!encounterFlashing)
+                        {
+                            IsMouseVisible = true;
+                        }
                         SPPlayerMapMove(gameTime);
                         SinglePlayerEncounter(gameTime);
                         if (plainsRect.Contains(redguyMapRect))
@@ -666,6 +671,7 @@ namespace TheGame
                     }
                     if (inCombat)
                     {
+                        IsMouseVisible = false;
                         if (debugmode)
                         {
                             if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
@@ -1657,6 +1663,9 @@ namespace TheGame
             trees.Add(new Tree(treeSprite, new Vector2(450 * resScale, 125 * resScale), resScale));
             trees.Add(new Tree(treeSprite, new Vector2(600 * resScale, 205 * resScale), resScale));
             trees.Add(new Tree(treeSprite, new Vector2(445 * resScale, 20 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(460 * resScale, 237 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(433 * resScale, 244 * resScale), resScale));
+            trees.Add(new Tree(treeSprite, new Vector2(568 * resScale, 100 * resScale), resScale));
         }
 
         void ClearScenery()
@@ -1691,7 +1700,7 @@ namespace TheGame
             coopButtonRect = new Rectangle(290 * resScale, 260 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
             settingsButtonRect = new Rectangle(5 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
             exitButtonRect = new Rectangle(595 * resScale, 400 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
-            tutorialButtonRect = new Rectangle(290 * resScale, 340 * resScale, oneButton.Width, oneButton.Height);
+            tutorialButtonRect = new Rectangle(290 * resScale, 340 * resScale, oneButton.Width * resScale, oneButton.Height * resScale);
 
             //Main Menu Drawing
             if (isInMainMenu)
@@ -1959,11 +1968,12 @@ namespace TheGame
                 // Encounter Flash drawing
                 if (encounterFlashing)
                 {
+                    IsMouseVisible = false;
                     if (flashDarken)
                     {
                         if (flashAlpha <= 250 && gameTime.TotalGameTime.TotalMilliseconds > flashLastIncrement + 1)
                         {
-                            flashAlpha += 10;
+                            flashAlpha += 15;
                             flashLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
                         }
                         _spriteBatch.Draw(bulletSprite, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), new Color(Color.White, flashAlpha));
@@ -1978,7 +1988,7 @@ namespace TheGame
                     {
                         if (flashAlpha >= 0 && gameTime.TotalGameTime.TotalMilliseconds > flashLastIncrement + 1)
                         {
-                            flashAlpha -= 10;
+                            flashAlpha -= 15;
                             flashLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
                         }
                         _spriteBatch.Draw(bulletSprite, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), new Color(Color.White, flashAlpha));
@@ -2038,10 +2048,10 @@ namespace TheGame
                         _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
                     }
                 }
-                if (debugmode)
-                {
-                    _spriteBatch.Draw(debugIndicator, new Rectangle(685 * resScale, 0, debugIndicator.Width / 2 * resScale, debugIndicator.Height / 2 * resScale), Color.White);
-                }
+            }
+            if (debugmode)
+            {
+                _spriteBatch.Draw(debugIndicator, new Rectangle(685 * resScale, 0, debugIndicator.Width / 2 * resScale, debugIndicator.Height / 2 * resScale), Color.White);
             }
 
             _spriteBatch.End();
