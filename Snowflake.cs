@@ -11,14 +11,18 @@ namespace TheGame
         public Texture2D texture;
         public Vector2 position;
         public Rectangle hitbox;
-        private float speed;
+        public float speedX;
+        public float speedY;
+        public Color color;
         int scale;
-        public Snowflake(Texture2D texture, Vector2 position, int scale)
+        public Snowflake(Texture2D texture, Vector2 position, float speedX, float speedY, int scale, Color color)
         {
             this.position = position;
             this.texture = texture;
-            speed = new Random().Next(2, 7);
+            this.speedX = speedX;
+            this.speedY = speedY;
             this.scale = scale;
+            this.color = color;
         }
         public void Snowfall(GameTime gameTime)
         {
@@ -27,12 +31,13 @@ namespace TheGame
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, hitbox, Color.White);
+            spriteBatch.Draw(texture, hitbox, color);
         }
+
         private void Movement(GameTime gameTime)
         {
-            position.X -= speed * scale;
-            position.Y += speed * scale;
+            position.X -= speedX * scale;
+            position.Y += speedY * scale;
         }
     }
 }

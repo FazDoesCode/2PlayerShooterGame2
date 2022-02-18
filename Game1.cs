@@ -78,18 +78,21 @@ namespace TheGame
         Texture2D frogAttackingSprite;
         Texture2D frogTongueSprite;
 
-        // Declaring misc
+        // Declaring Scenery
+        Texture2D cloudSprite;
         Texture2D mountainSprite;
         Texture2D gateSprite;
-        Texture2D bulletSprite;
-        Texture2D cloudSprite;
-        Texture2D whiteSquareSprite;
         Texture2D storeSprite;
+        Texture2D treeSprite;
+        Texture2D snowflakeSprite;
+        Texture2D swampTreeSprite;
+
+        // Declaring misc
+        Texture2D bulletSprite;
+        Texture2D whiteSquareSprite;
         Texture2D coinSprite;
         Texture2D shopkeeperSprite;
         Texture2D debugIndicator;
-        Texture2D treeSprite;
-        Texture2D snowflakeSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -216,7 +219,7 @@ namespace TheGame
         int blueDodgeDelay = 1200;
         int blueInvulnTimeD = 500;
         double bluetimeSinceLastDodge = 0;
-        double blueInvulnTimer = 0;
+        double blueInvulnTimerD = 0;
 
         float combatSpeed = 3;
         int dodgeDistance = 60;
@@ -414,6 +417,7 @@ namespace TheGame
             storeSprite = Content.Load<Texture2D>("Scenery/store");
             treeSprite = Content.Load<Texture2D>("Scenery/Tree");
             snowflakeSprite = Content.Load<Texture2D>("Scenery/snowflake");
+            swampTreeSprite = Content.Load<Texture2D>("Scenery/SwampTree");
 
             //Misc
             bulletSprite = Content.Load<Texture2D>("Items/Bullet");
@@ -562,7 +566,15 @@ namespace TheGame
                 {
                     if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSnow + 10)
                     {
-                        snow.Add(new Snowflake(snowflakeSprite, RandomSnowPos(), resScale));
+                        snow.Add(new Snowflake(snowflakeSprite, RandomSnowPos(), new Random().Next(2, 7), new Random().Next(2, 7), resScale, new Color(Color.White, 255)));
+                        timeSinceLastSnow = gameTime.TotalGameTime.TotalMilliseconds;
+                    }
+                }
+                if (isInSwamp && !wonCurrentEncounter)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSnow + 10)
+                    {
+                        snow.Add(new Snowflake(snowflakeSprite, RandomRainPos(), 0f, new Random().Next(5, 9), resScale, new Color(Color.Blue, 200))) ;
                         timeSinceLastSnow = gameTime.TotalGameTime.TotalMilliseconds;
                     }
                 }
@@ -1025,15 +1037,111 @@ namespace TheGame
                         inWorldMap = true;
                     }
                 }
+                if (inCoop)
+                {
+                    if (inWorldMap)
+                    {
+                        if (!encounterFlashing)
+                        {
+                            IsMouseVisible = true;
+                        }
+                        MPPlayerMapMove(gameTime);
+                        CoopEncounter(gameTime);
+                        if (plainsRect.Contains(coopMapRect))
+                        {
+                            isInPlains = true;
+                        }
+                        else
+                        {
+                            isInPlains = false;
+                        }
+                        if (snowRect.Contains(coopMapRect))
+                        {
+                            isInSnow = true;
+                        }
+                        else
+                        {
+                            isInSnow = false;
+                        }
+                        if (desertRect.Contains(coopMapRect))
+                        {
+                            isInDesert = true;
+                        }
+                        else
+                        {
+                            isInDesert = false;
+                        }
+                        if (swampRect.Contains(coopMapRect))
+                        {
+                            isInSwamp = true;
+                        }
+                        else
+                        {
+                            isInSwamp = false;
+                        }
+
+                        if (coopMapRect.Intersects(storeRect) && Keyboard.GetState().IsKeyDown(interact))
+                        {
+                            timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
+                            inWorldMap = false;
+                            inStore = true;
+                        }
+
+                        if (debugmode)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(Keys.K))
+                            {
+                                mountains.Add(new Mountain(mountainSprite, new Vector2((int)(mousePos.X), (int)(mousePos.Y)), resScale));
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.O))
+                            {
+                                trees.Add(new Tree(treeSprite, new Vector2((int)(mousePos.X), (int)(mousePos.Y)), resScale));
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.P))
+                            {
+                                ClearScenery();
+                                SpawnScenery();
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.L))
+                            {
+                                ForceEncounter(gameTime);
+                            }
+                            if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
+                            {
+                                ikeypressed = true;
+                                if (!showBoundaries)
+                                {
+                                    showBoundaries = true;
+                                }
+                                else
+                                {
+                                    showBoundaries = false;
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyUp(Keys.I) && ikeypressed == true)
+                            {
+                                ikeypressed = false;
+                            }
+                        }
+                    }
+                }
             }
             base.Update(gameTime);
         }
+
         private Vector2 RandomSnowPos()
         {
             int maxX = new Random().Next(0, _graphics.PreferredBackBufferWidth + 400 * resScale);
             int maxY = new Random().Next(0, _graphics.PreferredBackBufferHeight - 475 * resScale);
             return new Vector2(maxX, maxY);
         }
+        private Vector2 RandomRainPos()
+        {
+            int maxX = new Random().Next(0, _graphics.PreferredBackBufferWidth);
+            int maxY = 0;
+            return new Vector2(maxX, maxY);
+        }
+
         void SPPlayerMapMove(GameTime gameTime)
         {
             if (canMapMove)
@@ -1076,6 +1184,64 @@ namespace TheGame
                     for (int i = 0; i < mapBoundaries.Count; i++)
                     {
                         if (redguyMapRect.Intersects(mapBoundaries[i]))
+                        {
+                            mapPos = lastKnownPos;
+                            isMapMoving = false;
+                        }
+                    }
+                    lastKnownPos = mapPos;
+                    mapPos.X += movementX * ((float)mapSpeed * resScale);
+                    mapPos.Y += movementY * ((float)mapSpeed * resScale);
+                    if (distanceToTravelTotal < 1 * resScale)
+                    {
+                        isMapMoving = false;
+                    }
+                }
+            }
+        }
+
+        void MPPlayerMapMove(GameTime gameTime)
+        {
+            if (canMapMove)
+            {
+                MouseState mouseState = Mouse.GetState();
+                mousePos = new Point(mouseState.X, mouseState.Y);
+
+                if (!isClicking)
+                {
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        targetPos.X = mousePos.X - 7 * resScale;
+                        targetPos.Y = mousePos.Y - 13 * resScale;
+
+                        isMapMoving = true;
+                    }
+                }
+
+                if (isMapMoving)
+                {
+                    distanceToTravelX = targetPos.X - mapPos.X;
+                    distanceToTravelY = targetPos.Y - mapPos.Y;
+                    distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
+                    movementX = distanceToTravelX / distanceToTravelTotal;
+                    movementY = distanceToTravelY / distanceToTravelTotal;
+
+                    for (int i = 0; i < mountains.Count; i++)
+                    {
+                        if (coopMapRect.Intersects(mountains[i].mountainRect))
+                        {
+                            mapPos = lastKnownPos;
+                            isMapMoving = false;
+                        }
+                    }
+                    if (coopMapRect.Intersects(gateRect))
+                    {
+                        mapPos = lastKnownPos;
+                        isMapMoving = false;
+                    }
+                    for (int i = 0; i < mapBoundaries.Count; i++)
+                    {
+                        if (coopMapRect.Intersects(mapBoundaries[i]))
                         {
                             mapPos = lastKnownPos;
                             isMapMoving = false;
@@ -1183,6 +1349,188 @@ namespace TheGame
             }
         }
 
+        void MPCombatMove(GameTime gameTime)
+        {
+            if (canCombatMove)
+            {
+                if (redguyHealth >= 1)
+                {
+                    if (!redIsDodging)
+                    {
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveUp) && redguyPos.Y >= 180 * resScale)
+                        {
+                            redguyPos.Y -= combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveDown) && redguyPos.Y <= 390 * resScale)
+                        {
+                            redguyPos.Y += combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveLeft) && redguyPos.X >= 1 * resScale)
+                        {
+                            redguyPos.X -= combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyMoveRight) && redguyPos.X <= 340 * resScale)
+                        {
+                            redguyPos.X += combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(redguyShoot))
+                        {
+                            if (redfireDelay == false)
+                            {
+                                bullets.Add(new Bullet(bulletSprite, redguyPos + new Vector2(50 * resScale, 40 * resScale), new Vector2(7 * resScale, 0), resScale));
+                                redfireDelay = true;
+                            }
+                        }
+                        if (Keyboard.GetState().IsKeyUp(redguyShoot))
+                        {
+                            redfireDelay = false;
+                        }
+
+                        // Red dodging
+                        if (gameTime.TotalGameTime.TotalMilliseconds > redtimeSinceLastDodge + redDodgeDelay)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveDown))
+                            {
+                                if (redguyPos.Y <= 345 * resScale)
+                                {
+                                    redguyPos.Y += dodgeDistance;
+                                    RedDodge(gameTime);
+                                }
+                                else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveUp))
+                            {
+                                if (redguyPos.Y >= 250 * resScale)
+                                {
+                                    redguyPos.Y -= dodgeDistance;
+                                    RedDodge(gameTime);
+                                }
+                                else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveRight))
+                            {
+                                if (redguyPos.X <= 245 * resScale)
+                                {
+                                    redguyPos.X += dodgeDistance;
+                                    RedDodge(gameTime);
+                                }
+                                else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(redguyDodge) && Keyboard.GetState().IsKeyDown(redguyMoveLeft))
+                            {
+                                if (redguyPos.X >= 70 * resScale)
+                                {
+                                    redguyPos.X -= dodgeDistance;
+                                    RedDodge(gameTime);
+                                }
+                                else
+                                {
+                                    RedDodge(gameTime);
+
+                                }
+                            }
+                        }
+                    }
+                }
+                if (blueguyHealth >= 1)
+                {
+                    if (!blueIsDodging)
+                    {
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveUp) && blueguyPos.Y >= 180 * resScale)
+                        {
+                            blueguyPos.Y -= combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveDown) && redguyPos.Y <= 390 * resScale)
+                        {
+                            blueguyPos.Y += combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && redguyPos.X >= 1 * resScale)
+                        {
+                            blueguyPos.X -= combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveRight) && redguyPos.X <= 340 * resScale)
+                        {
+                            blueguyPos.X += combatSpeed;
+                        }
+                        if (Keyboard.GetState().IsKeyDown(blueguyShoot))
+                        {
+                            if (bluefireDelay == false)
+                            {
+                                bullets.Add(new Bullet(bulletSprite, blueguyPos + new Vector2(50 * resScale, 40 * resScale), new Vector2(7 * resScale, 0), resScale));
+                                bluefireDelay = true;
+                            }
+                        }
+                        if (Keyboard.GetState().IsKeyUp(blueguyShoot))
+                        {
+                            bluefireDelay = false;
+                        }
+
+                        // Blue dodging
+                        if (gameTime.TotalGameTime.TotalMilliseconds > bluetimeSinceLastDodge + blueDodgeDelay)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveDown))
+                            {
+                                if (blueguyPos.Y <= 345 * resScale)
+                                {
+                                    blueguyPos.Y += dodgeDistance;
+                                    RedDodge(gameTime);
+                                }
+                                else
+                                {
+                                    RedDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp))
+                            {
+                                if (blueguyPos.Y >= 250 * resScale)
+                                {
+                                    blueguyPos.Y -= dodgeDistance;
+                                    BlueDodge(gameTime);
+                                }
+                                else
+                                {
+                                    BlueDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveRight))
+                            {
+                                if (blueguyPos.X <= 245 * resScale)
+                                {
+                                    blueguyPos.X += dodgeDistance;
+                                    BlueDodge(gameTime);
+                                }
+                                else
+                                {
+                                    BlueDodge(gameTime);
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveLeft))
+                            {
+                                if (blueguyPos.X >= 70 * resScale)
+                                {
+                                    blueguyPos.X -= dodgeDistance;
+                                    BlueDodge(gameTime);
+                                }
+                                else
+                                {
+                                    BlueDodge(gameTime);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         void RedDodge(GameTime gameTime)
         {
             redtimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
@@ -1190,6 +1538,15 @@ namespace TheGame
             redIsDodging = true;
             redIsDodging = false;
             healthFlashR = 0;
+        }
+
+        void BlueDodge(GameTime gameTime)
+        {
+            bluetimeSinceLastDodge = gameTime.TotalGameTime.TotalMilliseconds;
+            blueInvulnTimerD = gameTime.TotalGameTime.TotalMilliseconds;
+            blueIsDodging = true;
+            blueIsDodging = false;
+            healthFlashB = 0;
         }
 
         void SinglePlayerEncounter(GameTime gameTime)
@@ -1257,6 +1614,74 @@ namespace TheGame
             }
         }
 
+        void CoopEncounter(GameTime gameTime)
+        {
+            if (isMapMoving && !coopMapRect.Intersects(storeRect))
+            {
+                if (isInPlains)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 3000)
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
+                        {
+                            int randomNumber = new Random().Next(1, 5);
+                            if (randomNumber == 1)
+                            {
+                                PlainsEncounter(gameTime);
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            else
+                            {
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                        }
+                    }
+                }
+                else if (isInSnow)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 3000)
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
+                        {
+                            int randomNumber = new Random().Next(1, 5);
+                            if (randomNumber == 1)
+                            {
+                                SnowEncounter(gameTime);
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            else
+                            {
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                        }
+                    }
+                }
+                else if (isInSwamp)
+                {
+                    if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounter + 3000)
+                    {
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastEncounterAttempt + 1500)
+                        {
+                            int randomNumber = new Random().Next(1, 5);
+                            if (randomNumber == 1)
+                            {
+                                SwampEncounter(gameTime);
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            else
+                            {
+                                timeSinceLastEncounterAttempt = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                        }
+                    }
+                }
+                else if (isInDesert)
+                {
+
+                }
+            }
+        }
+
         void PlainsEncounter(GameTime gameTime)
         {
             ClearEnemies();
@@ -1268,11 +1693,11 @@ namespace TheGame
             timesFlashed = 0;
             encounterFlashing = true;
             int etf = new Random().Next(1, 101);
-            if (etf <= 65)
+            if (etf <= 50)
             {
                 enemyToFight = 1;
             }
-            else if (etf >= 66)
+            else if (etf >= 51)
             {
                 enemyToFight = 2;
             }
@@ -1774,6 +2199,8 @@ namespace TheGame
                     {
                         trees[i].Draw(_spriteBatch);
                     }
+                    _spriteBatch.Draw(whiteSquareSprite, new Rectangle(460 * resScale, 392 * resScale, (storeSprite.Width + 10) * resScale, 13 * resScale), new Color(Color.Black, 100));
+                    _spriteBatch.Draw(swampTreeSprite, new Rectangle(460 * resScale, 325 * resScale, swampTreeSprite.Width * resScale, swampTreeSprite.Height * resScale), Color.White);
                     if (inSingleplayer)
                     {
                         if (mousePos.X < mapPos.X + 7 * resScale)
@@ -1794,6 +2221,10 @@ namespace TheGame
                             {
                                 trees[i].Draw(_spriteBatch);
                             }
+                        }
+                        if (mapPos.Y < 325 * resScale + 47 * resScale)
+                        {
+                            _spriteBatch.Draw(swampTreeSprite, new Rectangle(460 * resScale, 325 * resScale, swampTreeSprite.Width * resScale, swampTreeSprite.Height * resScale), Color.White);
                         }
                     }
                     if (inCoop)
@@ -1959,8 +2390,8 @@ namespace TheGame
                     {
                         bullets[i].Draw(_spriteBatch);
                     }
-                // Snow drawing
                 }
+                // Snow / rain drawing
                 for (int i = 0; i < snow.Count; i++)
                 {
                     snow[i].Draw(_spriteBatch);
