@@ -65,6 +65,8 @@ namespace TheGame
         Texture2D blueguyHurt2;
         Texture2D redguyHurt1Dodge;
         Texture2D redguyHurt2Dodge;
+        Texture2D blueguyHurt1Dodge;
+        Texture2D blueguyHurt2Dodge;
 
         //Declaring Enemies
         Texture2D smileyEnemySprite;
@@ -172,6 +174,9 @@ namespace TheGame
         // 6 = mosquito
         // 7 = desert snake
         // 8 = scorpion
+        // 9 = smiley boss
+        // 10 = frog boss
+        // 11 = statue boss
         int enemyToFight = 0;
 
         bool hasFought1 = false;
@@ -269,9 +274,8 @@ namespace TheGame
         Keys blueguyMoveDown = Keys.Down;
         Keys blueguyMoveLeft = Keys.Left;
         Keys blueguyMoveRight = Keys.Right;
-        Keys blueguyShoot = Keys.OemPeriod;
-        Keys blueguyDodge = Keys.OemComma;
-
+        Keys blueguyShoot = Keys.NumPad1;
+        Keys blueguyDodge = Keys.NumPad2;
         Keys interact = Keys.Enter;
 
         public Game1()
@@ -397,6 +401,8 @@ namespace TheGame
             blueguyHurt2 = Content.Load<Texture2D>("Players/blueguyhurt2");
             redguyHurt1Dodge = Content.Load<Texture2D>("Players/redguyhurt1dodge");
             redguyHurt2Dodge = Content.Load<Texture2D>("Players/redguyhurt2dodge");
+            blueguyHurt1Dodge = Content.Load<Texture2D>("Players/blueguyhurt1dodge");
+            blueguyHurt2Dodge = Content.Load<Texture2D>("Players/blueguyhurt2dodge");
 
             //Enemies
             smileyEnemySprite = Content.Load<Texture2D>("Enemies/Smiley");
@@ -1124,6 +1130,412 @@ namespace TheGame
                             }
                         }
                     }
+                    if (inCombat)
+                    {
+                        IsMouseVisible = false;
+                        if (debugmode)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
+                            {
+                                ikeypressed = true;
+                                if (!drawhitboxes)
+                                {
+                                    drawhitboxes = true;
+                                }
+                                else
+                                {
+                                    drawhitboxes = false;
+                                }
+                            }
+                            if (Keyboard.GetState().IsKeyUp(Keys.I) && ikeypressed == true)
+                            {
+                                ikeypressed = false;
+                            }
+                        }
+                        if (redguyHealth <= 0 && blueguyHealth <= 0)
+                        {
+                            //put game over here
+                            BackToMenu();
+                        }
+                        MPCombatMove(gameTime);
+                        // Smileys
+                        if (enemyToFight == 1)
+                        {
+                            for (int i = 0; i < smileys.Count; i++)
+                            {
+                                smileys[i].EnemyAction(gameTime);
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X || blueguyPos.Y + (20 * resScale) == smileys[i].position.Y && blueguyPos.X < smileys[i].position.X)
+                                {
+                                    smileys[i].Charge();
+                                }
+                                if (redguyHead.Intersects(smileys[i].smileyRect) || redguyBody.Intersects(smileys[i].smileyRect))
+                                {
+                                    if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                    {
+                                        redguyHealth--;
+                                        redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                        healthFlashR = 250;
+                                    }
+                                }
+                                if (blueguyHead.Intersects(smileys[i].smileyRect) || blueguyBody.Intersects(smileys[i].smileyRect))
+                                {
+                                    if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerD + blueInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerH + blueInvulnTimeH)
+                                    {
+                                        blueguyHealth--;
+                                        blueInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                        healthFlashB = 250;
+                                    }
+                                }
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(smileys[i].smileyRect))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        smileys[i].health -= playerDamage;
+                                    }
+                                }
+                                if (smileys[i].health <= 0)
+                                {
+                                    smileys.RemoveAt(i);
+                                }
+                                if (smileys.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                            }
+                            if (smileys.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
+                        }
+                        // Smiley Chieftain
+                        if (enemyToFight == 2)
+                        {
+                            for (int i = 0; i < smileyCheiftain.Count; i++)
+                            {
+                                smileyCheiftain[i].EnemyAction(gameTime);
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(smileyCheiftain[i].rectangle))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        smileyCheiftain[i].health -= playerDamage;
+                                    }
+                                }
+                                if (smileyCheiftain[i].health <= 0)
+                                {
+                                    smileyCheiftain.RemoveAt(i);
+                                }
+                                else
+                                {
+                                    for (int s = 0; s < smileys.Count; s++)
+                                    {
+                                        smileys[s].speed = 4;
+                                    }
+                                }
+                                if (smileyCheiftain.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                                if (smileyCheiftain.Count > 0)
+                                {
+                                    if (smileyCheiftain[i].isHyping)
+                                    {
+                                        for (int s = 0; s < smileys.Count; s++)
+                                        {
+                                            smileys[s].speed = 8;
+                                        }
+                                    }
+                                }
+                            }
+                            if (smileyCheiftain.Count <= 0)
+                            {
+                                ClearEnemies();
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
+                            for (int i = 0; i < smileys.Count; i++)
+                            {
+                                smileys[i].EnemyAction(gameTime);
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X || blueguyPos.Y + (20 * resScale) == smileys[i].position.Y && blueguyPos.X < smileys[i].position.X)
+                                {
+                                    smileys[i].Charge();
+                                }
+                                if (redguyHead.Intersects(smileys[i].smileyRect) || redguyBody.Intersects(smileys[i].smileyRect))
+                                {
+                                    if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                    {
+                                        redguyHealth--;
+                                        redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                        healthFlashR = 250;
+                                    }
+                                }
+                                if (blueguyHead.Intersects(smileys[i].smileyRect) || blueguyBody.Intersects(smileys[i].smileyRect))
+                                {
+                                    if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerD + blueInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerH + blueInvulnTimeH)
+                                    {
+                                        blueguyHealth--;
+                                        blueInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                        healthFlashB = 250;
+                                    }
+                                }
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(smileys[i].smileyRect))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        smileys[i].health -= playerDamage;
+                                    }
+                                }
+                                if (smileys[i].health <= 0)
+                                {
+                                    smileys.RemoveAt(i);
+                                    timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
+                                }
+                            }
+                            if (smileyCheiftain.Count > 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 7500 || smileys.Count <= 0 && gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSmileySpawn + 1000)
+                                {
+                                    int extraSmiley = new Random().Next(1, 3);
+                                    smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 290 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                                    if (extraSmiley == 2)
+                                    {
+                                        smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 340 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                                    }
+                                    timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
+                                }
+                            }
+                        }
+                        // Statue
+                        if (enemyToFight == 3)
+                        {
+                            for (int i = 0; i < statues.Count; i++)
+                            {
+                                statues[i].EnemyAction(gameTime);
+                                if (statues[i].position.Y + 65 * resScale >= redguyPos.Y + 10 * resScale && statues[i].position.Y + 65 * resScale <= redguyPos.Y + 20 * resScale)
+                                {
+                                    if (!statues[i].isAttacking)
+                                    {
+                                        statues[i].Attack(gameTime);
+                                    }
+                                }
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(statues[i].rectangle))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        statues[i].health -= playerDamage;
+                                    }
+                                }
+                                if (statues[i].health <= 0)
+                                {
+                                    statues.RemoveAt(i);
+                                }
+                                if (statues.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                                if (statues.Count > 0)
+                                {
+                                    if (statues[i].isAttacking)
+                                    {
+                                        if (redguyHead.Intersects(statues[i].beamRect) && statues[i].canDoDamage || redguyBody.Intersects(statues[i].beamRect) && statues[i].canDoDamage)
+                                        {
+                                            if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD)
+                                            {
+                                                redguyHealth--;
+                                            }
+                                        }
+                                        if (blueguyHead.Intersects(statues[i].beamRect) && statues[i].canDoDamage || blueguyBody.Intersects(statues[i].beamRect) && statues[i].canDoDamage)
+                                        {
+                                            if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerD + blueInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerH + blueInvulnTimeH)
+                                            {
+                                                blueguyHealth--;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (statues.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
+                        }
+                        // Yeti
+                        if (enemyToFight == 4)
+                        {
+                            for (int i = 0; i < yetis.Count; i++)
+                            {
+                                yetis[i].EnemyAction(gameTime);
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(yetis[i].hitbox))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        yetis[i].health -= playerDamage;
+                                    }
+                                }
+                                if (yetis[i].health <= 0)
+                                {
+                                    yetis.RemoveAt(i);
+                                }
+                                if (yetis.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                                if (yetis.Count > 0)
+                                {
+                                    if (redguyHead.Intersects(yetis[i].rockRect) || redguyBody.Intersects(yetis[i].rockRect))
+                                    {
+                                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                        {
+                                            redguyHealth--;
+                                            redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                            healthFlashR = 250;
+                                        }
+                                    }
+                                    if (blueguyHead.Intersects(yetis[i].rockRect) || blueguyBody.Intersects(yetis[i].rockRect))
+                                    {
+                                        if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerD + blueInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerH + blueInvulnTimeH)
+                                        {
+                                            blueguyHealth--;
+                                            blueInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                            healthFlashB = 250;
+                                        }
+                                    }
+                                }
+                            }
+                            if (yetis.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
+                        }
+                        // Frogs
+                        if (enemyToFight == 5)
+                        {
+                            for (int i = 0; i < frogs.Count; i++)
+                            {
+                                frogs[i].EnemyAction(gameTime);
+                                for (int b = 0; b < bullets.Count; b++)
+                                {
+                                    if (bullets[b].bulletRect.Intersects(frogs[i].hitbox))
+                                    {
+                                        bullets.RemoveAt(b);
+                                        frogs[i].health -= playerDamage;
+                                    }
+                                }
+                                if (frogs[i].health <= 0)
+                                {
+                                    frogs.RemoveAt(i);
+                                }
+                                if (frogs.Count <= 0)
+                                {
+                                    ClearEnemies();
+                                    timeSinceLastWon = gameTime.TotalGameTime.TotalMilliseconds;
+                                    AddCoin();
+                                    canCombatMove = false;
+                                    wonCurrentEncounter = true;
+                                }
+                                if (frogs.Count > 0)
+                                {
+                                    try
+                                    {
+                                        if (redguyHead.Intersects(frogs[i].tongueRect) || redguyBody.Intersects(frogs[i].tongueRect))
+                                        {
+                                            if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                                            {
+                                                redguyHealth--;
+                                                redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                                healthFlashR = 250;
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        return;
+                                    }
+                                    try
+                                    {
+                                        if (blueguyHead.Intersects(frogs[i].tongueRect) || blueguyBody.Intersects(frogs[i].tongueRect))
+                                        {
+                                            if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerD + blueInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerH + blueInvulnTimeH)
+                                            {
+                                                blueguyHealth--;
+                                                blueInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                                healthFlashB = 250;
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        return;
+                                    }
+                                }
+                            }
+                            if (frogs.Count <= 0)
+                            {
+                                if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 2000 && !addedCoin)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                                else if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastWon + 5000)
+                                {
+                                    EndCombat(gameTime);
+                                }
+                            }
+                        }
+                    }
+
+                    if (inStore && Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        escapeKeyWasPressed = true;
+                        inStore = false;
+                        inWorldMap = true;
+                    }
                 }
             }
             base.Update(gameTime);
@@ -1449,15 +1861,15 @@ namespace TheGame
                         {
                             blueguyPos.Y -= combatSpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveDown) && redguyPos.Y <= 390 * resScale)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveDown) && blueguyPos.Y <= 390 * resScale)
                         {
                             blueguyPos.Y += combatSpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && redguyPos.X >= 1 * resScale)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveLeft) && blueguyPos.X >= 1 * resScale)
                         {
                             blueguyPos.X -= combatSpeed;
                         }
-                        if (Keyboard.GetState().IsKeyDown(blueguyMoveRight) && redguyPos.X <= 340 * resScale)
+                        if (Keyboard.GetState().IsKeyDown(blueguyMoveRight) && blueguyPos.X <= 340 * resScale)
                         {
                             blueguyPos.X += combatSpeed;
                         }
@@ -1482,11 +1894,11 @@ namespace TheGame
                                 if (blueguyPos.Y <= 345 * resScale)
                                 {
                                     blueguyPos.Y += dodgeDistance;
-                                    RedDodge(gameTime);
+                                    BlueDodge(gameTime);
                                 }
                                 else
                                 {
-                                    RedDodge(gameTime);
+                                    BlueDodge(gameTime);
                                 }
                             }
                             if (Keyboard.GetState().IsKeyDown(blueguyDodge) && Keyboard.GetState().IsKeyDown(blueguyMoveUp))
@@ -2331,6 +2743,148 @@ namespace TheGame
                         {
                             _spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
                             _spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Red);
+                        }
+                    }
+                    if (inCoop)
+                    {
+                        redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * (3 * resScale), redguySprite.Height * (3 * resScale));
+                        redguyHead = new Rectangle((int)redguyPos.X + 2 * resScale, (int)redguyPos.Y + 2 * resScale, redguySprite.Width * (3 * resScale) - 5 * resScale, redguySprite.Height * (3 * resScale) - 50 * resScale);
+                        redguyBody = new Rectangle((int)redguyPos.X + 2 * resScale, (int)redguyPos.Y + 30 * resScale, redguySprite.Width * (3 * resScale) - 10 * resScale, redguySprite.Height * (3 * resScale) - 35 * resScale);
+                        Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguyDodgeSprite.Width * (3 * resScale), redguyDodgeSprite.Height * (3 * resScale));
+                        blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * (3 * resScale), blueguySprite.Height * (3 * resScale));
+                        blueguyHead = new Rectangle((int)blueguyPos.X + 2 * resScale, (int)blueguyPos.Y + 2 * resScale, blueguySprite.Width * (3 * resScale) - 5 * resScale, blueguySprite.Height * (3 * resScale) - 50 * resScale);
+                        redguyBody = new Rectangle((int)blueguyPos.X + 2 * resScale, (int)blueguyPos.Y + 30 * resScale, blueguySprite.Width * (3 * resScale) - 10 * resScale, blueguySprite.Height * (3 * resScale) - 35 * resScale);
+                        Rectangle blueguyDodgeRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguyDodgeSprite.Width * (3 * resScale), blueguyDodgeSprite.Height * (3 * resScale));
+
+                        if (redguyHealth <= 0)
+                        {
+                            _spriteBatch.Draw(graveStoneSprite, redguyRect, Color.White);
+                        }
+                        if (blueguyHealth <= 0)
+                        {
+                            _spriteBatch.Draw(graveStoneSprite, blueguyRect, Color.White);
+                        }
+
+                        // Player
+                        if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD)
+                        {
+                            if (redguyHealth >= 3)
+                            {
+                                _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+                            }
+                            else if (redguyHealth == 2)
+                            {
+                                _spriteBatch.Draw(redguyHurt1, redguyRect, Color.White);
+                                while (healthFlashR >= 0 && gameTime.TotalGameTime.TotalMilliseconds > redLastIncrement + 1)
+                                {
+                                    healthFlashR -= 10;
+                                    redLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                                }
+                                if (healthFlashR >= 0)
+                                {
+                                    _spriteBatch.Draw(redguyHurt1, redguyRect, new Color(Color.Red, healthFlashR));
+                                }
+                            }
+                            else if (redguyHealth == 1)
+                            {
+                                _spriteBatch.Draw(redguyHurt2, redguyRect, Color.White);
+                                while (healthFlashR >= 0 && gameTime.TotalGameTime.TotalMilliseconds > redLastIncrement + 1)
+                                {
+                                    healthFlashR -= 10;
+                                    redLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                                }
+                                if (healthFlashR >= 0)
+                                {
+                                    _spriteBatch.Draw(redguyHurt2, redguyRect, new Color(Color.Red, healthFlashR));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (redguyHealth >= 3)
+                            {
+                                _spriteBatch.Draw(redguyDodgeSprite, redguyDodgeRect, Color.White);
+                            }
+                            else if (redguyHealth == 2)
+                            {
+                                _spriteBatch.Draw(redguyHurt1Dodge, redguyDodgeRect, Color.White);
+                            }
+                            else if (redguyHealth == 1)
+                            {
+                                _spriteBatch.Draw(redguyHurt2Dodge, redguyDodgeRect, Color.White);
+                            }
+                        }
+
+                        if (gameTime.TotalGameTime.TotalMilliseconds > blueInvulnTimerD + blueInvulnTimeD)
+                        {
+                            if (blueguyHealth >= 3)
+                            {
+                                _spriteBatch.Draw(blueguySprite, blueguyRect, Color.White);
+                            }
+                            else if (blueguyHealth == 2)
+                            {
+                                _spriteBatch.Draw(blueguyHurt1, blueguyRect, Color.White);
+                                while (healthFlashB >= 0 && gameTime.TotalGameTime.TotalMilliseconds > blueLastIncrement + 1)
+                                {
+                                    healthFlashB -= 10;
+                                    blueLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                                }
+                                if (healthFlashB >= 0)
+                                {
+                                    _spriteBatch.Draw(blueguyHurt1, blueguyRect, new Color(Color.Red, healthFlashB));
+                                }
+                            }
+                            else if (blueguyHealth == 1)
+                            {
+                                _spriteBatch.Draw(blueguyHurt2, blueguyRect, Color.White);
+                                while (healthFlashB >= 0 && gameTime.TotalGameTime.TotalMilliseconds > blueLastIncrement + 1)
+                                {
+                                    healthFlashB -= 10;
+                                    blueLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                                }
+                                if (healthFlashB >= 0)
+                                {
+                                    _spriteBatch.Draw(blueguyHurt2, blueguyRect, new Color(Color.Red, healthFlashB));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (blueguyHealth >= 3)
+                            {
+                                _spriteBatch.Draw(blueguyDodgeSprite, blueguyDodgeRect, Color.White);
+                            }
+                            else if (blueguyHealth == 2)
+                            {
+                                _spriteBatch.Draw(blueguyHurt1Dodge, blueguyDodgeRect, Color.White);
+                            }
+                            else if (blueguyHealth == 1)
+                            {
+                                _spriteBatch.Draw(blueguyHurt2Dodge, blueguyDodgeRect, Color.White);
+                            }
+                        }
+
+                        if (blueguyPos.Y < redguyPos.Y)
+                        {
+                            if (redguyHealth <= 0)
+                            {
+                                _spriteBatch.Draw(graveStoneSprite, redguyRect, Color.White);
+                            }
+                        }
+                        if (redguyPos.Y < blueguyPos.Y)
+                        {
+                            if (blueguyHealth <= 0)
+                            {
+                                _spriteBatch.Draw(graveStoneSprite, blueguyRect, Color.White);
+                            }
+                        }
+
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
+                            _spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Red);
+                            _spriteBatch.Draw(whiteSquareSprite, blueguyHead, Color.Red);
+                            _spriteBatch.Draw(whiteSquareSprite, blueguyBody, Color.Red);
                         }
                     }
 
