@@ -580,7 +580,7 @@ namespace TheGame
                 {
                     if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastSnow + 10)
                     {
-                        snow.Add(new Snowflake(snowflakeSprite, RandomRainPos(), 0f, new Random().Next(5, 9), resScale, new Color(Color.Blue, 200))) ;
+                        snow.Add(new Snowflake(snowflakeSprite, RandomRainPos(), 0f, new Random().Next(5, 9), resScale, new Color(Color.Blue, 225)));
                         timeSinceLastSnow = gameTime.TotalGameTime.TotalMilliseconds;
                     }
                 }
@@ -601,8 +601,10 @@ namespace TheGame
                     timeSinceLastWon -= 7000;
                     escapeKeyWasPressed = true;
                 }
+                // SINGLEPLAYER START
                 if (inSingleplayer)
                 {
+                    // SINGLEPLAYER WORLD MAP
                     if (inWorldMap)
                     {
                         if (!encounterFlashing)
@@ -687,6 +689,7 @@ namespace TheGame
                             }
                         }
                     }
+                    // SINGLEPLAYER COMBAT
                     if (inCombat)
                     {
                         IsMouseVisible = false;
@@ -1043,8 +1046,10 @@ namespace TheGame
                         inWorldMap = true;
                     }
                 }
+                // MULTIPLAYER BEGIN
                 if (inCoop)
                 {
+                    // MULTIPLAYER WORLD MAP
                     if (inWorldMap)
                     {
                         if (!encounterFlashing)
@@ -2466,6 +2471,11 @@ namespace TheGame
             isMapMoving = false;
             ClearScenery();
             ClearEnemies();
+        }
+
+        void GameOver(GameTime gameTime)
+        {
+
         }
 
         // That scenery.
