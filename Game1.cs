@@ -79,6 +79,7 @@ namespace TheGame
         Texture2D frogSprite;
         Texture2D frogAttackingSprite;
         Texture2D frogTongueSprite;
+        Texture2D smileyWallSprite;
 
         // Declaring Scenery
         Texture2D cloudSprite;
@@ -108,6 +109,7 @@ namespace TheGame
         List<Rectangle> mapBoundaries = new List<Rectangle>();
         List<Tree> trees = new List<Tree>();
         List<Snowflake> snow = new List<Snowflake>();
+        List<SmileyBoss> smileyBoss = new List<SmileyBoss>();
 
         // Main menu stuff
         bool isInMainMenu = true;
@@ -261,6 +263,8 @@ namespace TheGame
         public Rectangle desertRect = new Rectangle(100, 235, 300, 240);
         public Rectangle swampRect = new Rectangle(400, 330, 300, 300);
 
+        public Rectangle smileyBossMapRect;
+
         // Red Guy Controls
         Keys redguyMoveUp = Keys.W;
         Keys redguyMoveDown = Keys.S;
@@ -274,8 +278,8 @@ namespace TheGame
         Keys blueguyMoveDown = Keys.Down;
         Keys blueguyMoveLeft = Keys.Left;
         Keys blueguyMoveRight = Keys.Right;
-        Keys blueguyShoot = Keys.NumPad1;
-        Keys blueguyDodge = Keys.NumPad2;
+        Keys blueguyShoot = Keys.OemComma;
+        Keys blueguyDodge = Keys.OemPeriod;
         Keys interact = Keys.Enter;
 
         public Game1()
@@ -415,6 +419,7 @@ namespace TheGame
             frogSprite = Content.Load<Texture2D>("Enemies/frog");
             frogAttackingSprite = Content.Load<Texture2D>("Enemies/frogattack");
             frogTongueSprite = Content.Load<Texture2D>("Enemies/frogtongue");
+            smileyWallSprite = Content.Load<Texture2D>("Enemies/smileywall");
 
             //Scenery
             mountainSprite = Content.Load<Texture2D>("Scenery/Mountain");
@@ -651,6 +656,23 @@ namespace TheGame
                             timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
                             inWorldMap = false;
                             inStore = true;
+                        }
+
+                        if (redguyMapRect.Intersects(smileyBossMapRect) && Keyboard.GetState().IsKeyDown(interact) && enterKeyWasPressed == false && !encounterFlashing)
+                        {
+                            encounterFlashing = true;
+                            isMapMoving = false;
+                            if (!encounterFlashing)
+                            {
+                                inWorldMap = false;
+                                inCombat = true;
+                                enemyToFight = 9;
+                                smileyBoss.Add(new SmileyBoss(smileyEnemySprite, smileyWallSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50));
+                            }
+                        }
+                        if (enterKeyWasPressed == true && Keyboard.GetState().IsKeyUp(interact))
+                        {
+                            enterKeyWasPressed = false;
                         }
 
                         if (debugmode)
@@ -1037,6 +1059,14 @@ namespace TheGame
                                 }
                             }
                         }
+                        // Smiley Boss
+                        if (enemyToFight == 9)
+                        {
+                            for (int i = 0; i < smileyBoss.Count; i++)
+                            {
+                                smileyBoss[i].EnemyAction(gameTime);
+                            }
+                        }
                     }
 
                     if (inStore && Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -1135,6 +1165,7 @@ namespace TheGame
                             }
                         }
                     }
+                    // MULTIPLAYER COMBAT
                     if (inCombat)
                     {
                         IsMouseVisible = false;
@@ -2623,6 +2654,26 @@ namespace TheGame
                     }
                     _spriteBatch.Draw(whiteSquareSprite, new Rectangle(460 * resScale, 392 * resScale, (storeSprite.Width + 10) * resScale, 13 * resScale), new Color(Color.Black, 100));
                     _spriteBatch.Draw(swampTreeSprite, new Rectangle(460 * resScale, 325 * resScale, swampTreeSprite.Width * resScale, swampTreeSprite.Height * resScale), Color.White);
+                    // Bosses
+                    if (bobUp)
+                    {
+                        smileyBossMapRect = new Rectangle(515 * resScale, 25 * resScale, smileyEnemySprite.Width * 3 * resScale, smileyEnemySprite.Height * 3 * resScale);
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastBob + 1250)
+                        {
+                            bobUp = false;
+                            timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                    }
+                    else
+                    {
+                        smileyBossMapRect = new Rectangle(515 * resScale, 30 * resScale, smileyEnemySprite.Width * 3 * resScale, smileyEnemySprite.Height * 3 * resScale);
+                        if (gameTime.TotalGameTime.TotalMilliseconds > timeSinceLastBob + 1250)
+                        {
+                            bobUp = true;
+                            timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
+                        }
+                    }
+                    _spriteBatch.Draw(smileyEnemySprite, smileyBossMapRect, Color.White);
                     if (inSingleplayer)
                     {
                         if (mousePos.X < mapPos.X + 7 * resScale)
@@ -2669,6 +2720,10 @@ namespace TheGame
                             {
                                 trees[i].Draw(_spriteBatch);
                             }
+                        }
+                        if (mapPos.Y < 325 * resScale + 47 * resScale)
+                        {
+                            _spriteBatch.Draw(swampTreeSprite, new Rectangle(460 * resScale, 325 * resScale, swampTreeSprite.Width * resScale, swampTreeSprite.Height * resScale), Color.White);
                         }
                     }
                     for (int i = 0; i < coinSprites.Count; i++)

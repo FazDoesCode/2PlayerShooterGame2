@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,14 +13,34 @@ namespace TheGame
         bool canDoAction = true;
         double timeSinceLastAction = 0;
         int randomNumber;
-        List<Smiley> bodyParts = new List<Smiley>();
+        int health;
+        int scale;
+        Texture2D smileyBossSprite;
+        Texture2D smileyWallSprite;
+        Vector2 position;
+        Rectangle hitBox;
+        Rectangle wallRect;
 
-        void EnemyAction(GameTime gameTime)
+        public SmileyBoss(Texture2D smileyBossSprite, Texture2D smileyWallSprite, Vector2 position, int scale, int health)
+        {
+            this.smileyBossSprite = smileyBossSprite;
+            this.smileyWallSprite = smileyWallSprite;
+            this.position = position;
+            this.scale = scale;
+            this.health = health;
+        }
+        
+        public void EnemyAction(GameTime gameTime)
         {
             if (gameTime.TotalGameTime.TotalMilliseconds > moveStart + moveDelay)
             {
 
             }
+        }
+
+        public void Draw(GameTime gameTime)
+        {
+
         }
     }
 }
