@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace TheGame
@@ -101,6 +102,7 @@ namespace TheGame
         {
             canAttack = false;
             isAttacking = true;
+            int randomNumber = new Random().Next(1, 3);
             if (game.inSingleplayer)
             {
                 if (game.redguyHealth > 0)
@@ -117,25 +119,31 @@ namespace TheGame
             }
             if (game.inCoop)
             {
-                int randomNumber = new Random().Next(1, 101);
-                if (game.redguyHealth > 0 && randomNumber < 51)
+                if (game.redguyHealth <= 0)
+                {
+                    randomNumber = 2;
+                } else if (game.blueguyHealth <= 0)
+                {
+                    randomNumber = 1;
+                }
+                if (randomNumber == 1)
                 {
                     redGuyPos.X = (int)game.redguyPos.Y;
                     redGuyPos.X = (int)game.redguyPos.Y;
 
-                    distanceToTravelX = redGuyPos.X - redGuyPos.X;
-                    distanceToTravelY = redGuyPos.Y - redGuyPos.Y;
+                    distanceToTravelX = redGuyPos.X - rockPos.X;
+                    distanceToTravelY = redGuyPos.Y - rockPos.Y;
                     distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
                     movementX = distanceToTravelX / distanceToTravelTotal;
                     movementY = distanceToTravelY / distanceToTravelTotal;
                 }
-                if (game.blueguyHealth > 0 && randomNumber > 50)
+                if (randomNumber == 2)
                 {
                     blueGuyPos.X = (int)game.blueguyPos.X;
                     blueGuyPos.Y = (int)game.blueguyPos.Y;
 
-                    distanceToTravelX = blueGuyPos.X - blueGuyPos.X;
-                    distanceToTravelY = blueGuyPos.Y - blueGuyPos.Y;
+                    distanceToTravelX = blueGuyPos.X - rockPos.X;
+                    distanceToTravelY = blueGuyPos.Y - rockPos.Y;
                     distanceToTravelTotal = (float)Math.Sqrt((distanceToTravelX * distanceToTravelX) + (distanceToTravelY * distanceToTravelY));
                     movementX = distanceToTravelX / distanceToTravelTotal;
                     movementY = distanceToTravelY / distanceToTravelTotal;

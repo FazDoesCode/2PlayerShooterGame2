@@ -662,12 +662,12 @@ namespace TheGame
                         {
                             encounterFlashing = true;
                             isMapMoving = false;
+                            smileyBoss.Add(new SmileyBoss(smileyEnemySprite, smileyWallSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50 * healthMultiplier));
                             if (!encounterFlashing)
                             {
                                 inWorldMap = false;
                                 inCombat = true;
                                 enemyToFight = 9;
-                                smileyBoss.Add(new SmileyBoss(smileyEnemySprite, smileyWallSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50));
                             }
                         }
                         if (enterKeyWasPressed == true && Keyboard.GetState().IsKeyUp(interact))
@@ -1370,11 +1370,24 @@ namespace TheGame
                             for (int i = 0; i < statues.Count; i++)
                             {
                                 statues[i].EnemyAction(gameTime);
-                                if (statues[i].position.Y + 65 * resScale >= redguyPos.Y + 10 * resScale && statues[i].position.Y + 65 * resScale <= redguyPos.Y + 20 * resScale)
+                                if (redguyHealth >= 1)
                                 {
-                                    if (!statues[i].isAttacking)
+                                    if (statues[i].position.Y + 65 * resScale >= redguyPos.Y + 10 * resScale && statues[i].position.Y + 65 * resScale <= redguyPos.Y + 20 * resScale)
                                     {
-                                        statues[i].Attack(gameTime);
+                                        if (!statues[i].isAttacking)
+                                        {
+                                            statues[i].Attack(gameTime);
+                                        }
+                                    }
+                                }
+                                if (blueguyHealth >= 1)
+                                {
+                                    if (statues[i].position.Y + 65 * resScale >= blueguyPos.Y + 10 * resScale && statues[i].position.Y + 65 * resScale <= blueguyPos.Y + 20 * resScale)
+                                    {
+                                        if (!statues[i].isAttacking)
+                                        {
+                                            statues[i].Attack(gameTime);
+                                        }
                                     }
                                 }
                                 for (int b = 0; b < bullets.Count; b++)
@@ -3003,6 +3016,10 @@ namespace TheGame
                         {
                             _spriteBatch.Draw(whiteSquareSprite, frogs[i].hitbox, Color.Red);
                         }
+                    }
+                    for (int i = 0; i < smileyBoss.Count; i++)
+                    {
+                        smileyBoss[i].Draw(_spriteBatch);
                     }
                     // Bullets
                     for (int i = 0; i < bullets.Count; i++)
