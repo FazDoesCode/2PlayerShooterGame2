@@ -128,8 +128,8 @@ namespace TheGame
                 }
                 if (randomNumber == 1)
                 {
-                    redGuyPos.X = (int)game.redguyPos.Y;
-                    redGuyPos.X = (int)game.redguyPos.Y;
+                    redGuyPos.X = (int)game.redguyPos.X;
+                    redGuyPos.Y = (int)game.redguyPos.Y;
 
                     distanceToTravelX = redGuyPos.X - rockPos.X;
                     distanceToTravelY = redGuyPos.Y - rockPos.Y;

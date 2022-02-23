@@ -1200,7 +1200,11 @@ namespace TheGame
                             for (int i = 0; i < smileys.Count; i++)
                             {
                                 smileys[i].EnemyAction(gameTime);
-                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X || blueguyPos.Y + (20 * resScale) == smileys[i].position.Y && blueguyPos.X < smileys[i].position.X)
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X && redguyHealth >= 1)
+                                {
+                                    smileys[i].Charge();
+                                }
+                                else if (blueguyPos.Y + (20 * resScale) == smileys[i].position.Y && blueguyPos.X < smileys[i].position.X && blueguyHealth >= 1)
                                 {
                                     smileys[i].Charge();
                                 }
@@ -1314,7 +1318,11 @@ namespace TheGame
                             for (int i = 0; i < smileys.Count; i++)
                             {
                                 smileys[i].EnemyAction(gameTime);
-                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X || blueguyPos.Y + (20 * resScale) == smileys[i].position.Y && blueguyPos.X < smileys[i].position.X)
+                                if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X && redguyHealth >= 1)
+                                {
+                                    smileys[i].Charge();
+                                }
+                                else if (blueguyPos.Y + (20 * resScale) == smileys[i].position.Y && blueguyPos.X < smileys[i].position.X && blueguyHealth >= 1)
                                 {
                                     smileys[i].Charge();
                                 }
@@ -2831,7 +2839,7 @@ namespace TheGame
                         Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguyDodgeSprite.Width * (3 * resScale), redguyDodgeSprite.Height * (3 * resScale));
                         blueguyRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguySprite.Width * (3 * resScale), blueguySprite.Height * (3 * resScale));
                         blueguyHead = new Rectangle((int)blueguyPos.X + 2 * resScale, (int)blueguyPos.Y + 2 * resScale, blueguySprite.Width * (3 * resScale) - 5 * resScale, blueguySprite.Height * (3 * resScale) - 50 * resScale);
-                        redguyBody = new Rectangle((int)blueguyPos.X + 2 * resScale, (int)blueguyPos.Y + 30 * resScale, blueguySprite.Width * (3 * resScale) - 10 * resScale, blueguySprite.Height * (3 * resScale) - 35 * resScale);
+                        blueguyBody = new Rectangle((int)blueguyPos.X + 2 * resScale, (int)blueguyPos.Y + 30 * resScale, blueguySprite.Width * (3 * resScale) - 10 * resScale, blueguySprite.Height * (3 * resScale) - 35 * resScale);
                         Rectangle blueguyDodgeRect = new Rectangle((int)blueguyPos.X, (int)blueguyPos.Y, blueguyDodgeSprite.Width * (3 * resScale), blueguyDodgeSprite.Height * (3 * resScale));
 
                         if (redguyHealth <= 0)
@@ -2959,10 +2967,16 @@ namespace TheGame
 
                         if (drawhitboxes)
                         {
-                            _spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
-                            _spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Red);
-                            _spriteBatch.Draw(whiteSquareSprite, blueguyHead, Color.Red);
-                            _spriteBatch.Draw(whiteSquareSprite, blueguyBody, Color.Red);
+                            if (redguyHealth > 0)
+                            {
+                                _spriteBatch.Draw(whiteSquareSprite, redguyHead, Color.Red);
+                                _spriteBatch.Draw(whiteSquareSprite, redguyBody, Color.Red);
+                            }
+                            if (blueguyHealth > 0)
+                            {
+                                _spriteBatch.Draw(whiteSquareSprite, blueguyHead, Color.Red);
+                                _spriteBatch.Draw(whiteSquareSprite, blueguyBody, Color.Red);
+                            }
                         }
                     }
 
@@ -3007,6 +3021,7 @@ namespace TheGame
                         if (drawhitboxes)
                         {
                             _spriteBatch.Draw(whiteSquareSprite, yetis[i].hitbox, Color.Red);
+                            _spriteBatch.Draw(whiteSquareSprite, yetis[i].rockRect, Color.Red);
                         }
                     }
                     for (int i = 0; i < frogs.Count; i++)
