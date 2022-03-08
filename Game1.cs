@@ -660,6 +660,7 @@ namespace TheGame
 
                         if (redguyMapRect.Intersects(smileyBossMapRect) && Keyboard.GetState().IsKeyDown(interact) && enterKeyWasPressed == false && !encounterFlashing)
                         {
+                            enemyToFight = 9;
                             encounterFlashing = true;
                             isMapMoving = false;
                             smileyBoss.Add(new SmileyBoss(smileyEnemySprite, smileyWallSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50 * healthMultiplier));
@@ -667,7 +668,6 @@ namespace TheGame
                             {
                                 inWorldMap = false;
                                 inCombat = true;
-                                enemyToFight = 9;
                             }
                         }
                         if (enterKeyWasPressed == true && Keyboard.GetState().IsKeyUp(interact))
@@ -714,7 +714,10 @@ namespace TheGame
                     // SINGLEPLAYER COMBAT
                     if (inCombat)
                     {
-                        IsMouseVisible = false;
+                        if (!debugmode)
+                        {
+                            IsMouseVisible = false;
+                        }
                         if (debugmode)
                         {
                             if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
@@ -1064,7 +1067,7 @@ namespace TheGame
                         {
                             for (int i = 0; i < smileyBoss.Count; i++)
                             {
-                                smileyBoss[i].EnemyAction(gameTime);
+                                smileyBoss[i].EnemyAction(gameTime, _graphics);
                             }
                         }
                     }
@@ -1168,7 +1171,10 @@ namespace TheGame
                     // MULTIPLAYER COMBAT
                     if (inCombat)
                     {
-                        IsMouseVisible = false;
+                        if (!debugmode)
+                        {
+                            IsMouseVisible = false;
+                        }
                         if (debugmode)
                         {
                             if (Keyboard.GetState().IsKeyDown(Keys.I) && ikeypressed == false)
@@ -3050,7 +3056,10 @@ namespace TheGame
                 // Encounter Flash drawing
                 if (encounterFlashing)
                 {
-                    IsMouseVisible = false;
+                    if (!debugmode)
+                    {
+                        IsMouseVisible = false;
+                    }
                     if (flashDarken)
                     {
                         if (flashAlpha <= 250 && gameTime.TotalGameTime.TotalMilliseconds > flashLastIncrement + 1)
