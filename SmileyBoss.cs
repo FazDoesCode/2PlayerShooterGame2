@@ -13,12 +13,12 @@ namespace TheGame
         double moveDelay = 500;
         double timeSinceLastAction = 0;
         int randomNumber;
-        int health;
+        public int health;
         int scale;
         Texture2D smileyBossSprite;
         Texture2D smileyWallSprite;
         Vector2 position;
-        Rectangle hitBox;
+        public Rectangle hitBox;
         Rectangle wallRect;
 
         bool canDoAction = true;
