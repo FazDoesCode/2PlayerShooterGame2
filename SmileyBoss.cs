@@ -70,11 +70,11 @@ namespace TheGame
                         position.Y += 3 * scale;
                         randomNumber = new Random().Next(1, 6);
                     }
-                    if (randomNumber == 2 && position.Y < graphics.PreferredBackBufferHeight - smileyBossSprite.Height * 7 * scale || randomNumber == 3 && position.Y < graphics.PreferredBackBufferHeight - smileyBossSprite.Height * 7 * scale)
+                    if (randomNumber == 2 && position.Y < graphics.PreferredBackBufferHeight - 10 * scale - smileyBossSprite.Height * 7 * scale || randomNumber == 3 && position.Y < graphics.PreferredBackBufferHeight - 10 * scale - smileyBossSprite.Height * 7 * scale)
                     {
                         position.Y += 3 * scale;
                     }
-                    else if (randomNumber == 2 && position.Y >= graphics.PreferredBackBufferHeight - smileyBossSprite.Height * 7 * scale || randomNumber == 3 && position.Y > graphics.PreferredBackBufferHeight - smileyBossSprite.Height * 7 * scale)
+                    else if (randomNumber == 2 && position.Y >= graphics.PreferredBackBufferHeight - 10 * scale - smileyBossSprite.Height * 7 * scale || randomNumber == 3 && position.Y > graphics.PreferredBackBufferHeight - 10 * scale - smileyBossSprite.Height * 7 * scale)
                     {
                         position.Y -= 3 * scale;
                         randomNumber = new Random().Next(1, 6);

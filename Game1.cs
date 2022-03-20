@@ -121,6 +121,7 @@ namespace TheGame
         bool gameHasStarted = false;
         bool inWorldMap = false;
         bool inCombat = false;
+        bool inTutorial = false;
         public bool inCoop = false;
         public bool inSingleplayer = false;
         Vector2 mapPos;
@@ -667,7 +668,7 @@ namespace TheGame
                             enemyToFight = 9;
                             encounterFlashing = true;
                             isMapMoving = false;
-                            smileyBoss.Add(new SmileyBoss(smileyEnemySprite, smileyWallSprite, new Vector2(500 * resScale, 200 * resScale), resScale, 50 * healthMultiplier));
+                            smileyBoss.Add(new SmileyBoss(smileyEnemySprite, smileyWallSprite, new Vector2(525 * resScale, 200 * resScale), resScale, 50 * healthMultiplier));
                             timeSinceLastSmileySpawn = gameTime.TotalGameTime.TotalMilliseconds;
                             if (!encounterFlashing)
                             {
@@ -753,7 +754,7 @@ namespace TheGame
                         {
                             for (int i = 0; i < smileys.Count; i++)
                             {
-                                smileys[i].EnemyAction(gameTime);
+                                smileys[i].EnemyAction(gameTime, _graphics);
                                 if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X)
                                 {
                                     smileys[i].Charge();
@@ -858,7 +859,7 @@ namespace TheGame
                             }
                             for (int i = 0; i < smileys.Count; i++)
                             {
-                                smileys[i].EnemyAction(gameTime);
+                                smileys[i].EnemyAction(gameTime, _graphics);
                                 if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X)
                                 {
                                     smileys[i].Charge();
@@ -1096,7 +1097,7 @@ namespace TheGame
                             }
                             for (int i = 0; i < smileys.Count; i++)
                             {
-                                smileys[i].EnemyAction(gameTime);
+                                smileys[i].EnemyAction(gameTime, _graphics);
                                 if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X)
                                 {
                                     smileys[i].Charge();
@@ -1278,7 +1279,7 @@ namespace TheGame
                         {
                             for (int i = 0; i < smileys.Count; i++)
                             {
-                                smileys[i].EnemyAction(gameTime);
+                                smileys[i].EnemyAction(gameTime, _graphics);
                                 if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X && redguyHealth >= 1)
                                 {
                                     smileys[i].Charge();
@@ -1396,7 +1397,7 @@ namespace TheGame
                             }
                             for (int i = 0; i < smileys.Count; i++)
                             {
-                                smileys[i].EnemyAction(gameTime);
+                                smileys[i].EnemyAction(gameTime, _graphics);
                                 if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X && redguyHealth >= 1)
                                 {
                                     smileys[i].Charge();
@@ -1692,7 +1693,7 @@ namespace TheGame
                             }
                             for (int i = 0; i < smileys.Count; i++)
                             {
-                                smileys[i].EnemyAction(gameTime);
+                                smileys[i].EnemyAction(gameTime, _graphics);
                                 if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X && redguyHealth >= 1)
                                 {
                                     smileys[i].Charge();

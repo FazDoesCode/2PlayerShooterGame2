@@ -37,7 +37,7 @@ namespace TheGame
             this.speed = speed;
         }
 
-        public void EnemyAction(GameTime gameTime)
+        public void EnemyAction(GameTime gameTime, GraphicsDeviceManager graphics)
         {
             if (canDoAction == true)
             {
@@ -62,11 +62,11 @@ namespace TheGame
                         MoveDown();
                         randomNumberToSix = 2;
                     }
-                    if (randomNumberToSix == 2 && position.Y < 370 * scale || randomNumberToSix == 6 && position.Y < 370 * scale)
+                    if (randomNumberToSix == 2 && position.Y < graphics.PreferredBackBufferHeight - 5 * scale - smileySprite.Height * 3 * scale || randomNumberToSix == 6 && position.Y < graphics.PreferredBackBufferHeight - 5 * scale - smileySprite.Height * 3 * scale)
                     {
                         MoveDown();
                     }
-                    else if (randomNumberToSix == 2 && position.Y >= 370 * scale || randomNumberToSix == 6 && position.Y >= 370 * scale)
+                    else if (randomNumberToSix == 2 && position.Y > graphics.PreferredBackBufferHeight - 5 * scale - smileySprite.Height * 3 * scale || randomNumberToSix == 6 && position.Y > graphics.PreferredBackBufferHeight - 5 * scale - smileySprite.Height * 3 * scale)
                     {
                         MoveUp();
                         randomNumberToSix = 1;
