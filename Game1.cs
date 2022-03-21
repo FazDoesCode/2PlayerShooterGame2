@@ -41,6 +41,8 @@ namespace TheGame
         Texture2D youWonText;
         Texture2D narbBackground;
         Texture2D winScreen;
+        Texture2D tutorialWorldMap;
+        Texture2D tutorialCombatMap;
         
         //Declaring Buttons
         Texture2D oneButton;
@@ -267,6 +269,8 @@ namespace TheGame
         public Rectangle desertRect = new Rectangle(100, 235, 300, 240);
         public Rectangle swampRect = new Rectangle(400, 330, 300, 300);
 
+        public Rectangle tutorialinteractable;
+
         public Rectangle smileyBossMapRect;
 
         // Red Guy Controls
@@ -385,6 +389,8 @@ namespace TheGame
             youWonText = Content.Load<Texture2D>("Backgrounds/YouWonText");
             narbBackground = Content.Load<Texture2D>("Backgrounds/narb");
             winScreen = Content.Load<Texture2D>("Backgrounds/winscreentemp");
+            tutorialWorldMap = Content.Load<Texture2D>("Backgrounds/tutorialzone");
+            tutorialCombatMap = Content.Load<Texture2D>("Backgrounds/tutorialzone2");
 
             //Buttons
             oneButton = Content.Load<Texture2D>("Items/1xbutton");
@@ -550,8 +556,15 @@ namespace TheGame
                 }
                 else if (tutorialButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
+                    mapPos.X = 240 * resScale;
+                    mapPos.Y = 200 * resScale;
+                    lastKnownPos.X = 240 * resScale;
+                    lastKnownPos.Y = 200 * resScale;
                     isClicking = true;
-                    Debug.WriteLine("tutorial");
+                    inTutorial = true;
+                    isInMainMenu = false;
+                    gameHasStarted = false;
+                    inWorldMap = true;
                 }
                 else if (settingsButtonRect.Intersects(mouseRect) && clicked && isClicking == false)
                 {
@@ -614,6 +627,7 @@ namespace TheGame
                 // SINGLEPLAYER START
                 if (inSingleplayer)
                 {
+                    mapSpeed = 0.85f;
                     // SINGLEPLAYER WORLD MAP
                     if (inWorldMap)
                     {
@@ -1142,6 +1156,7 @@ namespace TheGame
                 // MULTIPLAYER BEGIN
                 if (inCoop)
                 {
+                    mapSpeed = 0.85f;
                     // MULTIPLAYER WORLD MAP
                     if (inWorldMap)
                     {
@@ -1748,6 +1763,69 @@ namespace TheGame
                     }
                 }
             }
+            // TUTORIAL START
+            if (inTutorial)
+            {
+                redguyHealth = 3;
+                ClearScenery();
+                mapSpeed = 1.25f;
+                if (inWorldMap)
+                {
+                    SPPlayerMapMove(gameTime);
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        BackToMenu();
+                    }
+                    if (tutorialinteractable.Intersects(redguyMapRect) && Keyboard.GetState().IsKeyDown(interact))
+                    {
+                        inWorldMap = false;
+                        inCombat = true;
+                        smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 240 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                    }
+                }
+                if (inCombat)
+                {
+                    SPCombatMove(gameTime);
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    {
+                        BackToMenu();
+                    }
+                    for (int i = 0; i < smileys.Count; i++)
+                    {
+                        smileys[i].EnemyAction(gameTime, _graphics);
+                        if (redguyPos.Y + (20 * resScale) == smileys[i].position.Y && redguyPos.X < smileys[i].position.X)
+                        {
+                            smileys[i].Charge();
+                        }
+                        if (redguyHead.Intersects(smileys[i].smileyRect) || redguyBody.Intersects(smileys[i].smileyRect))
+                        {
+                            if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD && gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerH + redInvulnTimeH)
+                            {
+                                redguyHealth--;
+                                redInvulnTimerH = gameTime.TotalGameTime.TotalMilliseconds;
+                                healthFlashR = 250;
+                            }
+                        }
+                        for (int b = 0; b < bullets.Count; b++)
+                        {
+                            if (bullets[b].bulletRect.Intersects(smileys[i].smileyRect))
+                            {
+                                bullets.RemoveAt(b);
+                                smileys[i].health -= playerDamage;
+                            }
+                        }
+                        if (smileys[i].health <= 0)
+                        {
+                            smileys.RemoveAt(i);
+                        }
+                        if (smileys.Count <= 0)
+                        {
+                            ClearEnemies();
+                            BackToMenu();
+                        }
+                    }
+                }
+            }
             base.Update(gameTime);
         }
 
@@ -1798,7 +1876,7 @@ namespace TheGame
                             isMapMoving = false;
                         }
                     }
-                    if (redguyMapRect.Intersects(gateRect))
+                    if (redguyMapRect.Intersects(gateRect) && !inTutorial)
                     {
                         mapPos = lastKnownPos;
                         isMapMoving = false;
@@ -2609,6 +2687,11 @@ namespace TheGame
                 mapPos = new Vector2(390 * resScale, 225 * resScale);
                 lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
             }
+            if (inTutorial)
+            {
+                mapPos = new Vector2(390 * resScale, 225 * resScale);
+                lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
+            }
             // ^^ GAME OVER FUNCTION PLS
             int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
@@ -2677,6 +2760,7 @@ namespace TheGame
                 narb = true;
                 Window.Title = "NARB :DDD";
             }
+            inTutorial = false;
             isInMainMenu = true;
             gameHasStarted = false;
             inWorldMap = false;
@@ -2778,6 +2862,94 @@ namespace TheGame
                 _spriteBatch.Draw(exitButton, exitButtonRect, Color.White);
                 _spriteBatch.Draw(tutorialButton, tutorialButtonRect, Color.White);
                 _spriteBatch.Draw(oneButton, mouseRect, Color.Transparent);
+            }
+            // Tutorial Drawing
+            if (inTutorial)
+            {
+                Rectangle tutorialWorldMapRect = new Rectangle(0, 0, tutorialWorldMap.Width * resScale, tutorialWorldMap.Height * resScale);
+                if (inWorldMap)
+                {
+                    tutorialinteractable = new Rectangle(490 * resScale, 160 * resScale, 160 * resScale, 160 * resScale);
+                    _spriteBatch.Draw(tutorialWorldMap, tutorialWorldMapRect, Color.White);
+                    redguyMapRect = new Rectangle((int)mapPos.X, (int)mapPos.Y, redguySprite.Width * 2 * resScale, redguySprite.Height * 2 * resScale);
+                    if (mousePos.X < mapPos.X + 7 * 2 * resScale)
+                    {
+                        _spriteBatch.Draw(redguyFlipped, redguyMapRect, Color.White);
+                    }
+                    else
+                    {
+                        _spriteBatch.Draw(redguySprite, redguyMapRect, Color.White);
+                    }
+                }
+                if (inCombat)
+                {
+                    redguyRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguySprite.Width * (3 * resScale), redguySprite.Height * (3 * resScale));
+                    redguyHead = new Rectangle((int)redguyPos.X + 2 * resScale, (int)redguyPos.Y + 2 * resScale, redguySprite.Width * (3 * resScale) - 5 * resScale, redguySprite.Height * (3 * resScale) - 50 * resScale);
+                    redguyBody = new Rectangle((int)redguyPos.X + 2 * resScale, (int)redguyPos.Y + 30 * resScale, redguySprite.Width * (3 * resScale) - 10 * resScale, redguySprite.Height * (3 * resScale) - 35 * resScale);
+                    Rectangle redguyDodgeRect = new Rectangle((int)redguyPos.X, (int)redguyPos.Y, redguyDodgeSprite.Width * (3 * resScale), redguyDodgeSprite.Height * (3 * resScale));
+
+                    _spriteBatch.Draw(tutorialCombatMap, tutorialWorldMapRect, Color.White);
+                    if (gameTime.TotalGameTime.TotalMilliseconds > redInvulnTimerD + redInvulnTimeD)
+                    {
+                        if (redguyHealth >= 3)
+                        {
+                            _spriteBatch.Draw(redguySprite, redguyRect, Color.White);
+                        }
+                        else if (redguyHealth == 2)
+                        {
+                            _spriteBatch.Draw(redguyHurt1, redguyRect, Color.White);
+                            while (healthFlashR >= 0 && gameTime.TotalGameTime.TotalMilliseconds > redLastIncrement + 1)
+                            {
+                                healthFlashR -= 10;
+                                redLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            if (healthFlashR >= 0)
+                            {
+                                _spriteBatch.Draw(redguyHurt1, redguyRect, new Color(Color.Red, healthFlashR));
+                            }
+                        }
+                        else if (redguyHealth <= 1)
+                        {
+                            _spriteBatch.Draw(redguyHurt2, redguyRect, Color.White);
+                            while (healthFlashR >= 0 && gameTime.TotalGameTime.TotalMilliseconds > redLastIncrement + 1)
+                            {
+                                healthFlashR -= 10;
+                                redLastIncrement = gameTime.TotalGameTime.TotalMilliseconds;
+                            }
+                            if (healthFlashR >= 0)
+                            {
+                                _spriteBatch.Draw(redguyHurt2, redguyRect, new Color(Color.Red, healthFlashR));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (redguyHealth >= 3)
+                        {
+                            _spriteBatch.Draw(redguyDodgeSprite, redguyDodgeRect, Color.White);
+                        }
+                        else if (redguyHealth == 2)
+                        {
+                            _spriteBatch.Draw(redguyHurt1Dodge, redguyDodgeRect, Color.White);
+                        }
+                        else if (redguyHealth <= 1)
+                        {
+                            _spriteBatch.Draw(redguyHurt2Dodge, redguyDodgeRect, Color.White);
+                        }
+                    }
+                    for (int i = 0; i < smileys.Count; i++)
+                    {
+                        smileys[i].Draw(_spriteBatch);
+                        if (drawhitboxes)
+                        {
+                            _spriteBatch.Draw(whiteSquareSprite, smileys[i].smileyRect, Color.Red);
+                        }
+                    }
+                    for (int i = 0; i < bullets.Count; i++)
+                    {
+                        bullets[i].Draw(_spriteBatch);
+                    }
+                }
             }
             if (gameHasStarted)
             {
