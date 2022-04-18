@@ -447,6 +447,18 @@
 /processorParam:TextureFormat=Color
 /build:Items/coopbutton.png
 
+#begin Items/damagehat.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Items/damagehat.png
+
 #begin Items/exitbutton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -494,6 +506,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Items/singleplayerbutton.png
+
+#begin Items/speedhat.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Items/speedhat.png
 
 #begin Items/tutorialbutton.png
 /importer:TextureImporter

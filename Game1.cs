@@ -99,6 +99,8 @@ namespace TheGame
         Texture2D coinSprite;
         Texture2D shopkeeperSprite;
         Texture2D debugIndicator;
+        Texture2D damageHatSprite;
+        Texture2D speedHatSprite;
 
         //Listing stuff
         List<Bullet> bullets = new List<Bullet>();
@@ -290,6 +292,9 @@ namespace TheGame
         Keys blueguyDodge = Keys.OemPeriod;
         Keys interact = Keys.Enter;
 
+        public Hat damageHat;
+        public Hat speedHat;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -367,7 +372,6 @@ namespace TheGame
             _graphics.ApplyChanges();
 
             mapPos = new Vector2(390 * resScale, 225 * resScale);
-
             base.Initialize();
         }
 
@@ -447,6 +451,13 @@ namespace TheGame
             coinSprite = Content.Load<Texture2D>("Items/coin");
             shopkeeperSprite = Content.Load<Texture2D>("Scenery/DSL");
             debugIndicator = Content.Load<Texture2D>("Backgrounds/debug");
+            damageHatSprite = Content.Load<Texture2D>("Items/damagehat");
+            speedHatSprite = Content.Load<Texture2D>("Items/speedhat");
+
+            // Adding Hats
+            damageHat = new Hat(damageHatSprite, new Vector2(0, 0), "damage", resScale);
+            speedHat = new Hat(speedHatSprite, new Vector2(0, 0), "speed", resScale);
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -636,7 +647,10 @@ namespace TheGame
                             IsMouseVisible = true;
                         }
                         SPPlayerMapMove(gameTime);
-                        SinglePlayerEncounter(gameTime);
+                        if (!debugmode)
+                        {
+                            SinglePlayerEncounter(gameTime);
+                        }
                         if (plainsRect.Contains(redguyMapRect))
                         {
                             isInPlains = true;
@@ -759,8 +773,7 @@ namespace TheGame
                         }
                         if (redguyHealth <= 0)
                         {
-                            //put game over here
-                            BackToMenu();
+                            GameOver(gameTime);
                         }
                         SPCombatMove(gameTime);
                         // Smileys
@@ -1152,6 +1165,18 @@ namespace TheGame
                         inStore = false;
                         inWorldMap = true;
                     }
+
+                    if (inStore)
+                    {
+                        if (mouseRect.Intersects(damageHat.hatRect))
+                        {
+                            Debug.WriteLine("damage hat");
+                        }
+                        else if (mouseRect.Intersects(speedHat.hatRect))
+                        {
+                            Debug.WriteLine("speed hat");
+                        }
+                    }
                 }
                 // MULTIPLAYER BEGIN
                 if (inCoop)
@@ -1165,7 +1190,10 @@ namespace TheGame
                             IsMouseVisible = true;
                         }
                         MPPlayerMapMove(gameTime);
-                        CoopEncounter(gameTime);
+                        if (!debugmode)
+                        {
+                            CoopEncounter(gameTime);
+                        }
                         if (plainsRect.Contains(coopMapRect))
                         {
                             isInPlains = true;
@@ -1285,8 +1313,7 @@ namespace TheGame
                         }
                         if (redguyHealth <= 0 && blueguyHealth <= 0)
                         {
-                            //put game over here
-                            BackToMenu();
+                            GameOver(gameTime);
                         }
                         MPCombatMove(gameTime);
                         // Smileys
@@ -2680,19 +2707,12 @@ namespace TheGame
 
         void BackToMenu()
         {
-            narb = false;
-            // PUT THIS IN A GAME OVER FUNCTION
-            if (redguyHealth <= 0)
-            {
-                mapPos = new Vector2(390 * resScale, 225 * resScale);
-                lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
-            }
+            narb = false;            
             if (inTutorial)
             {
                 mapPos = new Vector2(390 * resScale, 225 * resScale);
                 lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
             }
-            // ^^ GAME OVER FUNCTION PLS
             int windowTitleThing = new Random().Next(1, 19);
             switch (windowTitleThing)
             {
@@ -2774,7 +2794,26 @@ namespace TheGame
 
         void GameOver(GameTime gameTime)
         {
+            if (redguyHealth <= 0 || blueguyHealth <= 0)
+            {
+                mapPos = new Vector2(390 * resScale, 225 * resScale);
+                lastKnownPos = new Vector2(390 * resScale, 225 * resScale);
+            }
 
+            playerCoins = 0;
+            hasFought1 = false;
+            hasFought2 = false;
+            hasFought3 = false;
+            hasFought4 = false;
+            hasFought5 = false;
+
+            damageHat.isPurchased = false;
+            damageHat.isEquipped = false;
+            speedHat.isPurchased = false;
+            speedHat.isEquipped = false;
+
+            // REPLACE WITH GAME OVER SCREEN, THEN MENU
+            BackToMenu();
         }
 
         // That scenery.
@@ -3466,6 +3505,19 @@ namespace TheGame
                             timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
                         }
                     }
+                    if (!damageHat.isEquipped)
+                    {
+                        damageHat.position = new Vector2(40 * resScale, 50 * resScale);
+                        damageHat.scale = resScale * 5;
+                        damageHat.Draw(_spriteBatch);
+                    }
+                    if (!speedHat.isEquipped)
+                    {
+                        speedHat.position = new Vector2(120 * resScale, 50 * resScale);
+                        speedHat.scale = resScale * 5;
+                        speedHat.Draw(_spriteBatch);
+                    }
+
                     _spriteBatch.Draw(shopCounterSprite, storeCounterRect, Color.White);
                     for (int i = 0; i < coinSprites.Count; i++)
                     {
