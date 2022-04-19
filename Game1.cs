@@ -455,8 +455,8 @@ namespace TheGame
             speedHatSprite = Content.Load<Texture2D>("Items/speedhat");
 
             // Adding Hats
-            damageHat = new Hat(damageHatSprite, new Vector2(0, 0), "damage", resScale);
-            speedHat = new Hat(speedHatSprite, new Vector2(0, 0), "speed", resScale);
+            damageHat = new Hat(damageHatSprite, new Vector2(0, 0), resScale);
+            speedHat = new Hat(speedHatSprite, new Vector2(0, 0), resScale);
 
         }
 
@@ -1170,11 +1170,47 @@ namespace TheGame
                     {
                         if (mouseRect.Intersects(damageHat.hatRect))
                         {
-                            Debug.WriteLine("damage hat");
+                            if (clicked)
+                            {
+                                if (!damageHat.isPurchased)
+                                {
+                                    if (playerCoins >= 2)
+                                    {
+                                        playerCoins = playerCoins - 2;
+                                        damageHat.isPurchased = true;
+                                        speedHat.isEquipped = false;
+                                        damageHat.isEquipped = true;
+                                        AddCoin2();
+                                    }
+                                }
+                                else
+                                {
+                                    speedHat.isEquipped = false;
+                                    damageHat.isEquipped = true;
+                                }
+                            }
                         }
                         else if (mouseRect.Intersects(speedHat.hatRect))
                         {
-                            Debug.WriteLine("speed hat");
+                            if (clicked)
+                            {
+                                if (!speedHat.isPurchased)
+                                {
+                                    if (playerCoins >= 2)
+                                    {
+                                        playerCoins = playerCoins - 2;
+                                        speedHat.isPurchased = true;
+                                        damageHat.isEquipped = false;
+                                        speedHat.isEquipped = true;
+                                        AddCoin2();
+                                    }
+                                }
+                                else
+                                {
+                                    damageHat.isEquipped = false;
+                                    speedHat.isEquipped = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -1485,6 +1521,7 @@ namespace TheGame
                                 {
                                     int extraSmiley = new Random().Next(1, 3);
                                     smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 290 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
+                                    smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 400 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
                                     if (extraSmiley == 2)
                                     {
                                         smileys.Add(new Smiley(smileyEnemySprite, new Vector2(570 * resScale, 340 * resScale), new Vector2(550 * resScale, 240 * resScale), resScale, 5 * healthMultiplier, 4));
@@ -2420,11 +2457,11 @@ namespace TheGame
             timesFlashed = 0;
             encounterFlashing = true;
             int etf = new Random().Next(1, 101);
-            if (etf <= 50)
+            if (etf <= 60)
             {
                 enemyToFight = 1;
             }
-            else if (etf >= 51)
+            else if (etf >= 61)
             {
                 enemyToFight = 2;
             }
@@ -2634,53 +2671,13 @@ namespace TheGame
         void AddCoin2()
         {
             coinSprites.Clear();
-            playerCoins = 0;
             coinDistance = 0;
-            if (hasFought1)
+            for (int i = 0; i < playerCoins; i++)
             {
-                if (playerCoins > 0)
+                if (i > 0)
                 {
                     coinDistance += 20;
                 }
-                playerCoins++;
-                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-            }
-
-            if (hasFought2)
-            {
-                if (playerCoins > 0)
-                {
-                    coinDistance += 20;
-                }
-                playerCoins++;
-                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-            }
-
-            if (hasFought3)
-            {
-                if (playerCoins > 0)
-                {
-                    coinDistance += 20;
-                }
-                playerCoins++;
-                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-            }
-            if (hasFought4)
-            {
-                if (playerCoins > 0)
-                {
-                    coinDistance += 20;
-                }
-                playerCoins++;
-                coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
-            }
-            if (hasFought5)
-            {
-                if (playerCoins > 0)
-                {
-                    coinDistance += 20;
-                }
-                playerCoins++;
                 coinSprites.Add(new Rectangle(0, (int)coinDistance * resScale, (int)coinSprite.Width * resScale, (int)coinSprite.Height * resScale));
             }
         }
@@ -2811,6 +2808,8 @@ namespace TheGame
             damageHat.isEquipped = false;
             speedHat.isPurchased = false;
             speedHat.isEquipped = false;
+
+            AddCoin2();
 
             // REPLACE WITH GAME OVER SCREEN, THEN MENU
             BackToMenu();
@@ -3074,10 +3073,24 @@ namespace TheGame
                         if (mousePos.X < mapPos.X + 7 * resScale)
                         {
                             _spriteBatch.Draw(redguyFlipped, redguyMapRect, Color.White);
+
                         }
                         else
                         {
                             _spriteBatch.Draw(redguySprite, redguyMapRect, Color.White);
+                        }
+                        // Hat Drawing
+                        if (damageHat.isEquipped)
+                        {
+                            damageHat.position = new Vector2(mapPos.X, mapPos.Y - 7 * resScale);
+                            damageHat.scale = resScale;
+                            damageHat.Draw(_spriteBatch);
+                        }
+                        if (speedHat.isEquipped)
+                        {
+                            speedHat.position = new Vector2(mapPos.X, mapPos.Y - 7 * resScale);
+                            speedHat.scale = resScale;
+                            speedHat.Draw(_spriteBatch);
                         }
                         if (mapPos.Y < storeRect.Y + 30 * resScale)
                         {
@@ -3198,6 +3211,18 @@ namespace TheGame
                             {
                                 _spriteBatch.Draw(redguyHurt2Dodge, redguyDodgeRect, Color.White);
                             }
+                        }
+                        if (damageHat.isEquipped)
+                        {
+                            damageHat.position = new Vector2(redguyPos.X + 2 * resScale, redguyPos.Y - 8 * 3 * resScale);
+                            damageHat.scale = resScale * 3;
+                            damageHat.Draw(_spriteBatch);
+                        }
+                        if (speedHat.isEquipped)
+                        {
+                            speedHat.position = new Vector2(redguyPos.X + 2 * resScale, redguyPos.Y - 8 * 3 * resScale);
+                            speedHat.scale = resScale * 3;
+                            speedHat.Draw(_spriteBatch);
                         }
                         if (drawhitboxes)
                         {
@@ -3505,9 +3530,21 @@ namespace TheGame
                             timeSinceLastBob = gameTime.TotalGameTime.TotalMilliseconds;
                         }
                     }
+
+                    _spriteBatch.Draw(shopCounterSprite, storeCounterRect, Color.White);
+                    for (int i = 0; i < coinSprites.Count; i++)
+                    {
+                        _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
+                    }
+
                     if (!damageHat.isEquipped)
                     {
                         damageHat.position = new Vector2(40 * resScale, 50 * resScale);
+                        damageHat.scale = resScale * 5;
+                        damageHat.Draw(_spriteBatch);
+                    } else
+                    {
+                        damageHat.position = new Vector2(15 * resScale, 365 * resScale);
                         damageHat.scale = resScale * 5;
                         damageHat.Draw(_spriteBatch);
                     }
@@ -3516,12 +3553,11 @@ namespace TheGame
                         speedHat.position = new Vector2(120 * resScale, 50 * resScale);
                         speedHat.scale = resScale * 5;
                         speedHat.Draw(_spriteBatch);
-                    }
-
-                    _spriteBatch.Draw(shopCounterSprite, storeCounterRect, Color.White);
-                    for (int i = 0; i < coinSprites.Count; i++)
+                    } else
                     {
-                        _spriteBatch.Draw(coinSprite, coinSprites[i], Color.White);
+                        speedHat.position = new Vector2(15 * resScale, 365 * resScale);
+                        speedHat.scale = resScale * 5;
+                        speedHat.Draw(_spriteBatch);
                     }
                 }
             }

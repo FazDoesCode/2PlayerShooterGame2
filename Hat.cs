@@ -16,11 +16,10 @@ namespace TheGame
         public bool isEquipped = false;
         public bool isPurchased = false;
 
-        public Hat(Texture2D texture, Vector2 position, string effect, int scale)
+        public Hat(Texture2D texture, Vector2 position, int scale)
         {
             this.texture = texture;
             this.position = position;
-            this.effect = effect;
             this.scale = scale;
         }
 
