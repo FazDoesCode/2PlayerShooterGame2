@@ -771,6 +771,17 @@ namespace TheGame
                                 ikeypressed = false;
                             }
                         }
+                        if (damageHat.isEquipped)
+                        {
+                            playerDamage = 2;
+                        } else if (speedHat.isEquipped)
+                        {
+                            combatSpeed = 5 * resScale;
+                        } else
+                        {
+                            playerDamage = 1;
+                            combatSpeed = 3 * resScale;
+                        }
                         if (redguyHealth <= 0)
                         {
                             GameOver(gameTime);
@@ -3073,24 +3084,34 @@ namespace TheGame
                         if (mousePos.X < mapPos.X + 7 * resScale)
                         {
                             _spriteBatch.Draw(redguyFlipped, redguyMapRect, Color.White);
-
+                            if (damageHat.isEquipped)
+                            {
+                                damageHat.position = new Vector2(mapPos.X - 1 * resScale, mapPos.Y - 8 * resScale);
+                                damageHat.scale = resScale;
+                                damageHat.Draw(_spriteBatch);
+                            }
+                            else if (speedHat.isEquipped)
+                            {
+                                speedHat.position = new Vector2(mapPos.X - 1 * resScale, mapPos.Y - 8 * resScale);
+                                speedHat.scale = resScale;
+                                speedHat.Draw(_spriteBatch);
+                            }
                         }
                         else
                         {
                             _spriteBatch.Draw(redguySprite, redguyMapRect, Color.White);
-                        }
-                        // Hat Drawing
-                        if (damageHat.isEquipped)
-                        {
-                            damageHat.position = new Vector2(mapPos.X, mapPos.Y - 7 * resScale);
-                            damageHat.scale = resScale;
-                            damageHat.Draw(_spriteBatch);
-                        }
-                        if (speedHat.isEquipped)
-                        {
-                            speedHat.position = new Vector2(mapPos.X, mapPos.Y - 7 * resScale);
-                            speedHat.scale = resScale;
-                            speedHat.Draw(_spriteBatch);
+                            if (damageHat.isEquipped)
+                            {
+                                damageHat.position = new Vector2(mapPos.X + 1 * resScale, mapPos.Y - 8 * resScale);
+                                damageHat.scale = resScale;
+                                damageHat.Draw(_spriteBatch);
+                            }
+                            else if (speedHat.isEquipped)
+                            {
+                                speedHat.position = new Vector2(mapPos.X + 1 * resScale, mapPos.Y - 8 * resScale);
+                                speedHat.scale = resScale;
+                                speedHat.Draw(_spriteBatch);
+                            }
                         }
                         if (mapPos.Y < storeRect.Y + 30 * resScale)
                         {
