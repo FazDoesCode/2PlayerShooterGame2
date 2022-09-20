@@ -774,8 +774,11 @@ namespace TheGame
                         if (damageHat.isEquipped)
                         {
                             playerDamage = 2;
-                        } else if (speedHat.isEquipped)
+                            combatSpeed = 3 * resScale;
+                        }
+                        else if (speedHat.isEquipped)
                         {
+                            playerDamage = 1;
                             combatSpeed = 5 * resScale;
                         } else
                         {
@@ -2468,11 +2471,11 @@ namespace TheGame
             timesFlashed = 0;
             encounterFlashing = true;
             int etf = new Random().Next(1, 101);
-            if (etf <= 60)
+            if (etf <= 55)
             {
                 enemyToFight = 1;
             }
-            else if (etf >= 61)
+            else if (etf >= 56)
             {
                 enemyToFight = 2;
             }
